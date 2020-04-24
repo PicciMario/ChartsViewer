@@ -1,0 +1,66 @@
+{
+  "name": "charts-viewer",
+  "description": "Visualizzatore documenti",
+  "version": "0.1.0",
+  "private": true,
+  "main": "public/electron.js",
+  "homepage": "./",
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "electron-is-dev": "^1.2.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1"
+  },
+  "scripts": {
+    "start": "rescripts start",
+    "build": "rescripts build",
+    "test": "rescripts test",
+    "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "electron-builder build -w"    
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@rescripts/cli": "^0.0.14",
+    "@rescripts/rescript-env": "^0.0.12",
+    "concurrently": "^5.1.0",
+    "electron": "^8.2.3",
+    "electron-builder": "^22.5.1",
+    "wait-on": "^4.0.2"
+  },
+  "author": {
+    "name": "Mario Piccinelli",
+    "email": "mario.piccinelli@gmail.com",
+    "url": "https://mariopiccinelli.it"
+  },
+  "build": {
+    "appId": "it.mariopiccinelli.chartsviewer",
+    "productName": "Charts Viewer",
+    "copyright": "Copyright © 2019 ${author}",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  }  
+}
