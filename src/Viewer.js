@@ -1,91 +1,71 @@
-import React, { Component } from 'react';
-import { Document, Page, Outline } from 'react-pdf';
-
-import fs from 'fs'
-import path from 'path'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Document, Page } from 'react-pdf';
 
 export default class Viewer extends React.Component {
 
-    constructor(){
+	static propTypes = {
+		filePath: PropTypes.string.isRequired
+	};
 
-        super();
+	static defaultPropTypes = {
+		filePath: null
+	}
 
-        let fileFolder = 'C:/Users/mario/Documents/charts-viewer/charts';
-        let filePath = path.join(fileFolder, 'prova.pdf')
+    constructor(props){
+
+        super(props);
 
         this.state = {
             numPages: null,
             pageNumber: 1,
-            fileFolder,
-            filePath
-        }
+            filePath: props.filePath
+		}
+		
     }
 
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
     }
 
-        render() {
+    render() {
 
-            if (this.state.fileFolder == null) return null;
+        const { pageNumber, numPages } = this.state;
 
-            const { remote } = window.require('electron')
-            console.log("appData", remote.app.getPath('appData'))
-            console.log("userData", remote.app.getPath('userData'))
-            console.log("appPath", remote.app.getAppPath())
+        return (
+            
+            <div>
 
-            fs.readdir(this.state.fileFolder, (err, dir) => {
-                for (let filePath of dir) {
-                    console.log(filePath);
+                <div>Path: {this.state.filePath}</div>
+
+                <Document
+                    file={this.state.filePath}
+                    onLoadSuccess={this.onDocumentLoadSuccess}
+                    onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+                    options={{
+                        // Gestione font mancanti
+                        disableFontFace: false
+                    }}
+                >
+
+                {
+                    Array.from(
+                        new Array(numPages),
+                            (el, index) => (
+                                <Page
+                                    key={`page_${index + 1}`}
+                                    pageNumber={index + 1}
+                                />
+                            ),
+                    )
                 }
-            });
 
-            const { pageNumber, numPages } = this.state;
+                </Document>
 
-            return (
-                
-                <div>
+                <p>Page {pageNumber} of {numPages}</p>
 
-                    <div>Path: {this.state.fileFolder}</div>
-
-                    <div
-                        onClick={() => {
-                            this.setState({
-                                filePath: path.join(this.state.fileFolder, 'prova2.pdf')
-                            })
-                        }}
-                    >
-                        documentazione
-                    </div>                
-
-                    <Document
-                        file={this.state.filePath}
-                        onLoadSuccess={this.onDocumentLoadSuccess}
-                        onLoadError={(error) => alert('Error while loading document! ' + error.message)}
-                        options={{
-                            // Gestione font mancanti
-                            disableFontFace: false
-                        }}
-                    >
-
-                    {
-                        Array.from(
-                            new Array(numPages),
-                                (el, index) => (
-                                    <Page
-                                        key={`page_${index + 1}`}
-                                        pageNumber={index + 1}
-                                    />
-                                ),
-                        )
-                    }
-
-                    </Document>
-
-                    <p>Page {pageNumber} of {numPages}</p>
-
-                </div>
-            );
+            </div>
+        );
 
     }
 
