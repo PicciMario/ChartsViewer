@@ -12,6 +12,7 @@
     "electron-is-dev": "^1.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-pdf": "^4.1.0",
     "react-scripts": "3.4.1"
   },
   "scripts": {
@@ -21,7 +22,7 @@
     "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
-    "electron-pack": "electron-builder build -w"    
+    "electron-pack": "electron-builder build -w"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -62,5 +63,5 @@
     "directories": {
       "buildResources": "assets"
     }
-  }  
+  }
 }
