@@ -22,10 +22,22 @@ export default class Viewer extends React.Component {
             filePath: props.filePath
 		}
 		
-    }
+	}
+	
+	componentWillReceiveProps(nextProps){
+		if (nextProps.filePath !== this.state.filePath){
+			this.setState({
+				filePath: nextProps.filePath,
+				pageNumber: 1
+			})
+		}
+	}
 
     onDocumentLoadSuccess = ({ numPages }) => {
-        this.setState({ numPages });
+        this.setState({ 
+			numPages,
+			pageNumber: 1
+		});
     }
 
     render() {
@@ -38,6 +50,8 @@ export default class Viewer extends React.Component {
 
                 <div>Path: {this.state.filePath}</div>
 
+				<div onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</div>
+
                 <Document
                     file={this.state.filePath}
                     onLoadSuccess={this.onDocumentLoadSuccess}
@@ -48,17 +62,10 @@ export default class Viewer extends React.Component {
                     }}
                 >
 
-                {
-                    Array.from(
-                        new Array(numPages),
-                            (el, index) => (
-                                <Page
-                                    key={`page_${index + 1}`}
-                                    pageNumber={index + 1}
-                                />
-                            ),
-                    )
-                }
+					<Page
+						key={`page_${this.state.pageNumber + 1}`}
+						pageNumber={this.state.pageNumber}
+					/>
 
                 </Document>
 

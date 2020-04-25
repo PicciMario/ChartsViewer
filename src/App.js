@@ -10,6 +10,7 @@ import Drawer from '@material-ui/core/Drawer';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import path from 'path'
+import fs from 'fs'
 
 // Modifiche per funzionamento worker react-pdf
 import { pdfjs } from 'react-pdf';
@@ -79,9 +80,26 @@ class App extends React.Component {
         let filePath = path.join(fileFolder, 'prova.pdf')		
 
 		this.state = {
+			fileFolder,
 			filePath
 		}
 
+	}
+
+	componentDidMount(){
+		
+		fs.readdir(this.state.fileFolder, (err, dir) => {
+            this.setState({
+				fileList: dir
+			})
+		});
+
+	}
+
+	setFilePath = (fileName) => {
+		this.setState({
+			filePath: path.join(this.state.fileFolder, fileName)	
+		})
 	}
 
 	render(){
@@ -113,7 +131,10 @@ class App extends React.Component {
 				>
 					<Toolbar variant="dense" />
 					ciao
-					<FilesTree />
+					<FilesTree 
+						fileList={this.state.fileList}
+						setFilePath={this.setFilePath}
+					/>
 				</Drawer>
 
 				<main className={classes.content}>
