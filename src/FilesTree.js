@@ -22,7 +22,7 @@ class FilesTree extends React.Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
 		fileList: PropTypes.array,
-		setFilePath: PropTypes.func.isRequired
+		setSelectedNode: PropTypes.func.isRequired
 	};
 
 	static defaultPropTypes = {
@@ -44,23 +44,38 @@ class FilesTree extends React.Component {
 		}
 	}
 
-	renderDirContent(dirItems){
+	renderDirContent(dirItems, parentRelPath = null){
 		
 		let ritorno = [];
 
 		if (dirItems == null) return ritorno;
 		
-		dirItems.forEach(dirItem => {
+		dirItems
+		.filter(item => item.parentRelPath === parentRelPath)
+		.sort((a,b) => {
+
+			// dirs before files
+			if (a.type !== b.type){
+				if (a.type === 'dir') return -1;
+				else return 1;
+			}
+
+			if (a.name > b.name) return 1;
+			else if (a.name < b.name) return -1;
+			else return 0;
+			
+		})
+		.forEach(dirItem => {
 			switch (dirItem.type){
 
 				case "file":
-					ritorno.push(<TreeItem nodeId={dirItem.fullPath} label={dirItem.name}/>);
+					ritorno.push(<TreeItem nodeId={dirItem.relPath} label={dirItem.name}/>);
 					break;
 
 				case "dir":
 					ritorno.push(
-						<TreeItem nodeId={dirItem.fullPath} label={dirItem.name}>
-							{this.renderDirContent(dirItem.children)}
+						<TreeItem nodeId={dirItem.relPath} label={dirItem.name}>
+							{this.renderDirContent(dirItems, dirItem.relPath)}
 						</TreeItem>
 					);
 					break;
@@ -86,7 +101,7 @@ class FilesTree extends React.Component {
 				defaultCollapseIcon={<ExpandMoreIcon />}
 				defaultExpandIcon={<ChevronRightIcon />}
 				onNodeSelect={(event, value) => {
-					this.props.setFilePath(value)
+					this.props.setSelectedNode(this.state.fileList.find(item => item.relPath === value));
 				}}
 			>
 

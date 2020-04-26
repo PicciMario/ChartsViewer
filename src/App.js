@@ -91,73 +91,68 @@ class App extends React.Component {
 	componentDidMount(){
 		
 		this.setState({
-			fileList: this._readDirStruct(this.state.fileFolder)
+			fileList: this._readDirSubNodes()
 		})
 
-	}
-
-	/**
-	 * Restituisce un array rappresentante il contenuto della cartella passata
-	 * come parametro (chiamata ricorsivamente).
-	 * @param {*} basePath 
-	 */
-	_readDirStruct__(basePath){
-		
-		let content = [];
-
-		fs.readdir(basePath, (err, dirElements) => {
-			
-			dirElements.forEach(dirElement => {
-
-				let elementPath = path.join(basePath, dirElement)
-				fs.stat(elementPath, (err, stats) => {
-					if (stats.isDirectory()){
-						content.push({name: dirElement, fullpath: elementPath, type: "dir", children: this._readDirStruct(elementPath)})
-					}
-					else {
-						content.push({name: dirElement, fullpath: elementPath, type: "file"});
-					}
-				})
-
-			})
-
-		})		
-
-		return content;
+		console.log(this._readDirSubNodes())
 
 	}
 
 	/**
 	 * Restituisce un array rappresentante il contenuto della cartella passata
 	 * come parametro (chiamata ricorsivamente).
-	 * @param {*} basePath 
+	 * @param {*} dirNode 
 	 */
-	_readDirStruct(basePath){
+	_readDirSubNodes(dirNode){
 		
+		let {fileFolder} = this.state;
+		let parentRelPath = dirNode != null ? dirNode.relPath : null;
+		let parentFullPath = path.join(fileFolder, parentRelPath || "")
+
 		let content = [];
 
-		fs.readdirSync(basePath).forEach(dirElement => {
+		fs.readdirSync(parentFullPath).forEach(dirElement => {
 
-			let elementPath = path.join(basePath, dirElement)
-			let stats = fs.statSync(elementPath);
+			let elementRelPath = path.join(parentRelPath || "", dirElement)
+			let elementFullPath = path.join(fileFolder, elementRelPath)
+
+			let stats = fs.statSync(elementFullPath);
 			if (stats.isDirectory()){
-				content.push({name: dirElement, fullPath: elementPath, type: "dir", children: this._readDirStruct(elementPath)})
+				let newNode = {
+					parentRelPath: parentRelPath,
+					name: dirElement, 
+					relPath: elementRelPath, 
+					type: "dir"
+				};
+				content.push(newNode)
+				this._readDirSubNodes(newNode).forEach(item => content.push(item))
+
 			}
 			else {
-				content.push({name: dirElement, fullPath: elementPath, type: "file"});
+				let newNode = {
+					parentRelPath: parentRelPath,
+					name: dirElement, 
+					relPath: elementRelPath, 
+					type: "file"
+				};
+				content.push(newNode);
 			}
 
 		})
 
 		return content;
 
-	}	
+	}		
 
-	setFilePath = (filePath) => {
-		this.setState({
-			//filePath: path.join(this.state.fileFolder, fileName)	
-			filePath
-		})
+	setSelectedNode = (selNode) => {
+
+		if (selNode.type === 'file'){
+			this.setState({
+				//filePath: path.join(this.state.fileFolder, fileName)	
+				filePath: path.join(this.state.fileFolder, selNode.relPath)
+			})
+		}
+		
 	}
 
 	render(){
@@ -191,7 +186,7 @@ class App extends React.Component {
 					ciao
 					<FilesTree 
 						fileList={this.state.fileList}
-						setFilePath={this.setFilePath}
+						setSelectedNode={this.setSelectedNode}
 					/>
 				</Drawer>
 
