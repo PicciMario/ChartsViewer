@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Document, Page } from 'react-pdf';
+import { Button } from '@material-ui/core';
 
 export default class Viewer extends React.Component {
 
 	static propTypes = {
-		filePath: PropTypes.string.isRequired
+		filePath: PropTypes.string
 	};
 
 	static defaultPropTypes = {
@@ -18,7 +19,8 @@ export default class Viewer extends React.Component {
 
         this.state = {
             numPages: null,
-            pageNumber: 1,
+			pageNumber: 1,
+			scale: 1.0,
             filePath: props.filePath
 		}
 		
@@ -28,7 +30,8 @@ export default class Viewer extends React.Component {
 		if (this.props.filePath !== this.state.filePath){
 			this.setState({
 				filePath: this.props.filePath,
-				pageNumber: 1
+				pageNumber: 1,
+				scale: 1.0
 			})
 		}
 	}
@@ -50,7 +53,9 @@ export default class Viewer extends React.Component {
 
                 <div>Path: {this.state.filePath}</div>
 
-				<div onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</div>
+				<Button onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</Button>
+				<Button onClick={() => this.setState({scale: this.state.scale + 0.1})}>Zoom+</Button>
+
 
                 <Document
                     file={this.state.filePath}
@@ -61,11 +66,16 @@ export default class Viewer extends React.Component {
                         disableFontFace: false
                     }}
                 >
-
+					<div style={{
+						overflow: 'scroll',
+						width: "100%"
+					}}>
 					<Page
 						key={`page_${this.state.pageNumber + 1}`}
 						pageNumber={this.state.pageNumber}
+						scale={this.state.scale}
 					/>
+					</div>
 
                 </Document>
 

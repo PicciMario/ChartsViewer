@@ -63,18 +63,18 @@ class FilesTree extends React.Component {
 			if (a.name > b.name) return 1;
 			else if (a.name < b.name) return -1;
 			else return 0;
-			
+
 		})
 		.forEach(dirItem => {
 			switch (dirItem.type){
 
 				case "file":
-					ritorno.push(<TreeItem nodeId={dirItem.relPath} label={dirItem.name}/>);
+					ritorno.push(<TreeItem key={dirItem.relPath} nodeId={dirItem.relPath} label={dirItem.name}/>);
 					break;
 
 				case "dir":
 					ritorno.push(
-						<TreeItem nodeId={dirItem.relPath} label={dirItem.name}>
+						<TreeItem key={dirItem.relPath} nodeId={dirItem.relPath} label={dirItem.name}>
 							{this.renderDirContent(dirItems, dirItem.relPath)}
 						</TreeItem>
 					);

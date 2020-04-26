@@ -90,11 +90,12 @@ class App extends React.Component {
 
 	componentDidMount(){
 		
-		this.setState({
-			fileList: this._readDirSubNodes()
-		})
+		let fileList = this._readDirSubNodes(); 
+		console.log("File list", fileList);
 
-		console.log(this._readDirSubNodes())
+		this.setState({
+			fileList
+		});
 
 	}
 
@@ -152,7 +153,7 @@ class App extends React.Component {
 				filePath: path.join(this.state.fileFolder, selNode.relPath)
 			})
 		}
-		
+
 	}
 
 	render(){
