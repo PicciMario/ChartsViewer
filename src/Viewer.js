@@ -45,18 +45,39 @@ export default class Viewer extends React.Component {
 
     render() {
 
-        const { pageNumber, numPages } = this.state;
+		const { pageNumber, numPages } = this.state;
+		
+		const headerHeight = 50;
 
         return (
             
-            <div>
+            <React.Fragment>
 
-                <div>Path: {this.state.filePath}</div>
+                <div
+					style={{
+						position: "absolute",
+						top: 0,
+						height: headerHeight,
+						left: 0,
+						right: 0
+					}}
+				>
+					Path: {this.state.filePath}
+					<Button onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</Button>
+					<Button onClick={() => this.setState({scale: this.state.scale + 0.1})}>Zoom+</Button>					
+				</div>
 
-				<Button onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</Button>
-				<Button onClick={() => this.setState({scale: this.state.scale + 0.1})}>Zoom+</Button>
-
-
+				<div
+					style={{
+						position: "absolute",
+						top: headerHeight,
+						bottom: 0,
+						left: 0,
+						right: 0,
+						overflowX: "auto",
+						overflowY: "auto"
+					}}
+				>
                 <Document
                     file={this.state.filePath}
                     onLoadSuccess={this.onDocumentLoadSuccess}
@@ -66,22 +87,19 @@ export default class Viewer extends React.Component {
                         disableFontFace: false
                     }}
                 >
-					<div style={{
-						overflow: 'scroll',
-						width: "100%"
-					}}>
+
 					<Page
 						key={`page_${this.state.pageNumber + 1}`}
 						pageNumber={this.state.pageNumber}
 						scale={this.state.scale}
 					/>
-					</div>
 
                 </Document>
 
                 <p>Page {pageNumber} of {numPages}</p>
+				</div>
 
-            </div>
+            </React.Fragment>
         );
 
     }

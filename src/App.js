@@ -158,6 +158,86 @@ class App extends React.Component {
 
 	render(){
 
+		const headerHeight = 50;
+		const menuWidth = 250;
+
+		return (
+
+			<React.Fragment>
+
+			<div
+				style={{
+					position: "absolute",
+					height: headerHeight,
+					left: 0,
+					right: 0,
+					top: 0,
+
+					backgroundColor: "lightGray",
+
+					display: "flex",
+					alignItems: "center"
+
+				}}
+			>
+				<span
+					style={{
+						fontSize: "x-large",
+						fontWeight: "bold"
+					}}
+				>
+					Charts Viewer
+				</span>
+			</div>
+
+			<div
+				style={{
+
+					position: "absolute",
+					top: headerHeight,
+					left: 0,
+					width: menuWidth,
+					bottom: 0,
+
+					overflowX: "hidden",
+					overflowY: "auto",
+
+					borderRight: "1px solid darkgray"
+
+				}}
+			>
+				<FilesTree 
+					fileList={this.state.fileList}
+					setSelectedNode={this.setSelectedNode}
+				/>
+			</div>
+
+
+			<div
+				style={{
+
+					position: "absolute",
+					top: headerHeight,
+					left: menuWidth+5,
+					right: 0,
+					bottom: 0,
+
+					//overflowX: "auto",
+					//overflowY: "auto"					
+
+				}}
+			>
+				<Viewer filePath={this.state.filePath}/>
+			</div>
+
+			</React.Fragment>
+
+		);
+
+	}
+
+	_render(){
+
 		// Classi per gli stili custom
 		const {classes} = this.props;
 
