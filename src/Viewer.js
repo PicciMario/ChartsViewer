@@ -23,6 +23,8 @@ export default class Viewer extends React.Component {
 			scale: 1.0,
             filePath: props.filePath
 		}
+
+		this.viewerDiv = null;
 		
 	}
 	
@@ -68,6 +70,7 @@ export default class Viewer extends React.Component {
 				</div>
 
 				<div
+					ref={ref => this.viewerDiv = ref}
 					style={{
 						position: "absolute",
 						top: headerHeight,
@@ -77,7 +80,18 @@ export default class Viewer extends React.Component {
 						overflowX: "auto",
 						overflowY: "auto"
 					}}
+					onMouseMove={e => {
+
+						let div = this.viewerDiv;
+						if (div == null) return;
+						div.scrollTo(
+							div.scrollLeft + e.movementX,
+							div.scrollTop + e.movementY
+						)
+
+					}}
 				>
+
                 <Document
                     file={this.state.filePath}
                     onLoadSuccess={this.onDocumentLoadSuccess}
