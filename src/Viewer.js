@@ -24,10 +24,10 @@ export default class Viewer extends React.Component {
 		
 	}
 	
-	componentWillReceiveProps(nextProps){
-		if (nextProps.filePath !== this.state.filePath){
+	componentDidUpdate(prevProps, prevState, snapshot){
+		if (this.props.filePath !== this.state.filePath){
 			this.setState({
-				filePath: nextProps.filePath,
+				filePath: this.props.filePath,
 				pageNumber: 1
 			})
 		}

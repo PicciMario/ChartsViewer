@@ -36,10 +36,43 @@ class FilesTree extends React.Component {
 		}
 	}
 
-	componentWillReceiveProps(nextProps){
-		this.setState({
-			fileList: nextProps.fileList
+	componentDidUpdate(prevProps, prevState){
+		if (this.props.fileList !== prevProps.fileList){
+			this.setState({
+				fileList: this.props.fileList
+			})
+		}
+	}
+
+	renderDirContent(dirItems){
+		
+		let ritorno = [];
+
+		if (dirItems == null) return ritorno;
+		
+		dirItems.forEach(dirItem => {
+			switch (dirItem.type){
+
+				case "file":
+					ritorno.push(<TreeItem nodeId={dirItem.fullPath} label={dirItem.name}/>);
+					break;
+
+				case "dir":
+					ritorno.push(
+						<TreeItem nodeId={dirItem.fullPath} label={dirItem.name}>
+							{this.renderDirContent(dirItem.children)}
+						</TreeItem>
+					);
+					break;
+
+				default:
+					break;
+
+			}
 		})
+
+		return ritorno;
+
 	}
 
 	render(){
@@ -52,28 +85,13 @@ class FilesTree extends React.Component {
 				className={classes.root}
 				defaultCollapseIcon={<ExpandMoreIcon />}
 				defaultExpandIcon={<ChevronRightIcon />}
-				onNodeSelect={(event, value) => this.props.setFilePath(value)}
+				onNodeSelect={(event, value) => {
+					this.props.setFilePath(value)
+				}}
 			>
-				{
-					this.state.fileList != null
-					&& this.state.fileList.map(file => 
-						<TreeItem nodeId={file} label={file}/>
-					)
-				}
-				<TreeItem nodeId="1" label="Applications">
-				<TreeItem nodeId="2" label="Calendar" />
-				<TreeItem nodeId="3" label="Chrome" />
-				<TreeItem nodeId="4" label="Webstorm" />
-				</TreeItem>
-				<TreeItem nodeId="5" label="Documents">
-				<TreeItem nodeId="10" label="OSS" />
-				<TreeItem nodeId="6" label="Material-UI">
-				<TreeItem nodeId="7" label="src">
-				<TreeItem nodeId="8" label="index.js" />
-				<TreeItem nodeId="9" label="tree-view.js" />
-				</TreeItem>
-				</TreeItem>
-				</TreeItem>
+
+				{this.renderDirContent(this.state.fileList)}
+
 			</TreeView>
 		);
 	}

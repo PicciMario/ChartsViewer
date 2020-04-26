@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import path from 'path'
 import fs from 'fs'
+import os from 'os'
 
 // Modifiche per funzionamento worker react-pdf
 import { pdfjs } from 'react-pdf';
@@ -76,29 +77,86 @@ class App extends React.Component {
 		
 		super();
 
-        let fileFolder = 'C:/Users/mario/Documents/charts-viewer/charts';
-        let filePath = path.join(fileFolder, 'prova.pdf')		
-
 		this.state = {
-			fileFolder,
-			filePath
+
+			// Percorso assoluto della cartella contenente i documenti
+			fileFolder: 'C:/Users/mario/Documents/charts-viewer/charts',
+
+			// Percorso assoluto del file attualmente aperto
+			filePath: null
 		}
 
 	}
 
 	componentDidMount(){
 		
-		fs.readdir(this.state.fileFolder, (err, dir) => {
-            this.setState({
-				fileList: dir
-			})
-		});
+		this.setState({
+			fileList: this._readDirStruct(this.state.fileFolder)
+		})
 
 	}
 
-	setFilePath = (fileName) => {
+	/**
+	 * Restituisce un array rappresentante il contenuto della cartella passata
+	 * come parametro (chiamata ricorsivamente).
+	 * @param {*} basePath 
+	 */
+	_readDirStruct__(basePath){
+		
+		let content = [];
+
+		fs.readdir(basePath, (err, dirElements) => {
+			
+			dirElements.forEach(dirElement => {
+
+				let elementPath = path.join(basePath, dirElement)
+				fs.stat(elementPath, (err, stats) => {
+					if (stats.isDirectory()){
+						content.push({name: dirElement, fullpath: elementPath, type: "dir", children: this._readDirStruct(elementPath)})
+					}
+					else {
+						content.push({name: dirElement, fullpath: elementPath, type: "file"});
+					}
+				})
+
+			})
+
+		})		
+
+		return content;
+
+	}
+
+	/**
+	 * Restituisce un array rappresentante il contenuto della cartella passata
+	 * come parametro (chiamata ricorsivamente).
+	 * @param {*} basePath 
+	 */
+	_readDirStruct(basePath){
+		
+		let content = [];
+
+		fs.readdirSync(basePath).forEach(dirElement => {
+
+			let elementPath = path.join(basePath, dirElement)
+			let stats = fs.statSync(elementPath);
+			if (stats.isDirectory()){
+				content.push({name: dirElement, fullPath: elementPath, type: "dir", children: this._readDirStruct(elementPath)})
+			}
+			else {
+				content.push({name: dirElement, fullPath: elementPath, type: "file"});
+			}
+
+		})
+
+		return content;
+
+	}	
+
+	setFilePath = (filePath) => {
 		this.setState({
-			filePath: path.join(this.state.fileFolder, fileName)	
+			//filePath: path.join(this.state.fileFolder, fileName)	
+			filePath
 		})
 	}
 
