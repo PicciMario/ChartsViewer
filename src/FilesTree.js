@@ -90,6 +90,16 @@ class FilesTree extends React.Component {
 
 	}
 
+	/**
+	 * Callback selezione nodo.
+	 */
+	onNodeSelect = (event, value) => {
+		let fileObject = this.state.fileList.find(item => item.relPath === value);
+		if (fileObject !== null && fileObject.type === 'file'){
+			this.props.setSelectedNode(fileObject);
+		}
+	}
+
 	render(){
 
 		// Classi per gli stili custom
@@ -101,9 +111,7 @@ class FilesTree extends React.Component {
 				className={classes.root}
 				defaultCollapseIcon={<ExpandMoreIcon />}
 				defaultExpandIcon={<ChevronRightIcon />}
-				onNodeSelect={(event, value) => {
-					this.props.setSelectedNode(this.state.fileList.find(item => item.relPath === value));
-				}}
+				onNodeSelect={this.onNodeSelect}
 			>
 
 				{this.renderDirContent(this.state.fileList)}

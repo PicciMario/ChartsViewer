@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Document, Page } from 'react-pdf';
 import { Button } from '@material-ui/core';
+import path from 'path';
 
 export default class Viewer extends React.Component {
 
 	static propTypes = {
-		filePath: PropTypes.string
+		fileObject: PropTypes.object,
+		basePath: PropTypes.string.isRequired
 	};
 
 	static defaultPropTypes = {
-		filePath: null
+		fileObject: null
 	}
 
     constructor(props){
@@ -21,7 +23,8 @@ export default class Viewer extends React.Component {
             numPages: null,
 			pageNumber: 1,
 			scale: 1.0,
-			filePath: props.filePath,
+			fileObject: props.fileObject,
+			basePath: props.basePath,
 			dragging: false
 		}
 
@@ -49,9 +52,9 @@ export default class Viewer extends React.Component {
 
 	
 	componentDidUpdate(prevProps, prevState, snapshot){
-		if (this.props.filePath !== this.state.filePath){
+		if (this.props.fileObject !== this.state.fileObject){
 			this.setState({
-				filePath: this.props.filePath,
+				fileObject: this.props.fileObject,
 				pageNumber: 1,
 				scale: 1.0
 			})
@@ -113,6 +116,14 @@ export default class Viewer extends React.Component {
 
     render() {
 
+		console.log("render", this.state)
+
+		if (
+			this.state.basePath == null
+			|| this.state.fileObject == null
+			|| this.state.fileObject.type !== 'file'
+		) return null;
+
 		const { pageNumber, numPages } = this.state;
 		
 		const headerHeight = 50;
@@ -130,7 +141,7 @@ export default class Viewer extends React.Component {
 						right: 0
 					}}
 				>
-					Path: {this.state.filePath}
+					Path: {this.state.fileObject.name}
 					<Button onClick={() => this.setState({pageNumber: Math.max(this.state.pageNumber - 1, 0)})}>Prev</Button>				
 					<Button onClick={() => this.setState({pageNumber: Math.min(this.state.pageNumber + 1, this.state.numPages)})}>Next</Button>				
 				</div>
@@ -164,7 +175,7 @@ export default class Viewer extends React.Component {
 				}}>
 
 					<Document
-						file={this.state.filePath}
+						file={path.join(this.state.basePath, this.state.fileObject.relPath)}
 						onLoadSuccess={this.onDocumentLoadSuccess}
 						onLoadError={(error) => alert('Error while loading document! ' + error.message)}
 						options={{
@@ -188,7 +199,7 @@ export default class Viewer extends React.Component {
 				</div>
 			
             </React.Fragment>
-			
+
         );
 
     }

@@ -73,10 +73,10 @@ class App extends React.Component {
 		this.state = {
 
 			// Percorso assoluto della cartella contenente i documenti
-			fileFolder: '',
+			basePath: '',
 
 			// Percorso assoluto del file attualmente aperto
-			filePath: null
+			fileObject: null
 		}
 
 	}
@@ -92,7 +92,7 @@ class App extends React.Component {
 		let configFile = path.join(app.getPath('userData'), 'prova.json');
 
 		let data = JSON.stringify({
-			fileFolder: 'C:/Users/mario/Documents/charts-viewer/charts'
+			basePath: 'C:/Users/mario/Documents/charts-viewer/charts'
 		});
 		fs.writeFileSync(configFile, data);
 
@@ -101,7 +101,7 @@ class App extends React.Component {
 		
 		this.setState(
 			{
-				fileFolder: readData.fileFolder
+				basePath: readData.basePath
 			},
 			() => {
 				let fileList = this._readDirSubNodes(); 
@@ -122,9 +122,9 @@ class App extends React.Component {
 	 */
 	_readDirSubNodes(dirNode){
 		
-		let {fileFolder} = this.state;
+		let {basePath} = this.state;
 		let parentRelPath = dirNode != null ? dirNode.relPath : null;
-		let parentFullPath = path.join(fileFolder, parentRelPath || "")
+		let parentFullPath = path.join(basePath, parentRelPath || "")
 
 		let content = [];
 
@@ -141,7 +141,7 @@ class App extends React.Component {
 		readFiles.forEach(dirElement => {
 
 			let elementRelPath = path.join(parentRelPath || "", dirElement)
-			let elementFullPath = path.join(fileFolder, elementRelPath)
+			let elementFullPath = path.join(basePath, elementRelPath)
 
 			let stats;
 			try{
@@ -180,14 +180,9 @@ class App extends React.Component {
 	}		
 
 	setSelectedNode = (selNode) => {
-
-		if (selNode.type === 'file'){
-			this.setState({
-				//filePath: path.join(this.state.fileFolder, fileName)	
-				filePath: path.join(this.state.fileFolder, selNode.relPath)
-			})
-		}
-
+		this.setState({
+			fileObject: selNode
+		})
 	}
 
 	render(){
@@ -219,11 +214,13 @@ class App extends React.Component {
 				/>
 			</div>
 
-
 			<div className={classes.viewerDiv}>
 				{
-					this.state.filePath &&
-					<Viewer filePath={this.state.filePath}/>
+					this.state.fileObject &&
+					<Viewer 
+						fileObject={this.state.fileObject}
+						basePath={this.state.basePath}
+					/>
 				}
 			</div>
 
