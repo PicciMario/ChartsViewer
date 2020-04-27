@@ -3,8 +3,39 @@ import PropTypes from 'prop-types';
 import { Document, Page } from 'react-pdf';
 import { Button } from '@material-ui/core';
 import path from 'path';
+import { withStyles } from '@material-ui/core/styles';
 
-export default class Viewer extends React.Component {
+// Component styles -----------------------------------------------------------
+
+const headerHeight = 50;
+
+const styles = (theme) => ({
+
+	headerDiv: {
+		position: "absolute",
+		top: 0,
+		height: headerHeight,
+		left: 0,
+		right: 0
+	},
+
+	viewerDiv: {
+		position: "absolute",
+		top: headerHeight,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		overflowX: "auto",
+		overflowY: "auto",
+		display:'flex',
+		flexDirection: "column",
+	}
+
+});
+
+// ----------------------------------------------------------------------------
+
+class Viewer extends React.Component {
 
 	static propTypes = {
 		fileObject: PropTypes.object,
@@ -106,15 +137,30 @@ export default class Viewer extends React.Component {
 
 	}
 
-	enableDrag = () => {
+	/**
+	 * Enables drag.
+	 * Callback for mouse down on viewer.
+	 */
+	enableDrag = (e) => {
+		// prevents text selection while panning
+		e.preventDefault();		
 		this.setState({dragging: true});
 	}
 
-	disableDrag = () => {
+	/**
+	 * Disables drag.
+	 * Callback for mouse up/out from viewer.
+	 */	
+	disableDrag = (e) => {
 		this.setState({dragging: false});
 	}
 
+	// ------------------------------------------------------------------------
+
     render() {
+
+		// Custom styles classnames
+		const {classes} = this.props;		
 
 		if (
 			this.state.basePath == null
@@ -123,22 +169,12 @@ export default class Viewer extends React.Component {
 		) return null;
 
 		const { pageNumber, numPages, fileObject, basePath, scale } = this.state;
-		
-		const headerHeight = 50;
 
         return (
             
             <React.Fragment>
 
-                <div
-					style={{
-						position: "absolute",
-						top: 0,
-						height: headerHeight,
-						left: 0,
-						right: 0
-					}}
-				>
+                <div className={classes.headerDiv}>
 					Path: {fileObject.name}
 					<Button onClick={() => this.setState({pageNumber: Math.max(pageNumber - 1, 0)})}>Prev</Button>				
 					<Button onClick={() => this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})}>Next</Button>				
@@ -146,38 +182,19 @@ export default class Viewer extends React.Component {
 
 				<div
 					ref={this.viewerDiv}
-					style={{
-						position: "absolute",
-						top: headerHeight,
-						bottom: 0,
-						left: 0,
-						right: 0,
-						overflowX: "auto",
-						overflowY: "auto",
-						display:'flex',
-						flexDirection: "column",
-					}}
-
+					className={classes.viewerDiv}
 					onMouseMove={this.handleMouseMove}
-					onMouseDown={e => {
-						// impedisce la selezione accidentale di testo nel pdf
-						e.preventDefault();
-						this.enableDrag();
-					}}
+					onMouseDown={this.enableDrag}
 					onMouseUp={this.disableDrag}
 					onMouseLeave={this.disableDrag}
 				>
-
-				<div style={{
-					alignSelf: "normal"
-				}}>
 
 					<Document
 						file={path.join(basePath, fileObject.relPath)}
 						onLoadSuccess={this.onDocumentLoadSuccess}
 						onLoadError={(error) => alert('Error while loading document! ' + error.message)}
 						options={{
-							// Gestione font mancanti
+							// Missing fonts
 							disableFontFace: false
 						}}
 					>
@@ -193,8 +210,6 @@ export default class Viewer extends React.Component {
 					<p>Page {pageNumber} of {numPages}</p>
 
 				</div>
-
-				</div>
 			
             </React.Fragment>
 
@@ -203,3 +218,5 @@ export default class Viewer extends React.Component {
     }
 
 }
+
+export default withStyles(styles)(Viewer);

@@ -6,6 +6,8 @@ import TreeItem from '@material-ui/lab/TreeItem';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
+// Component styles -----------------------------------------------------------
+
 const styles = (theme) => ({
 
 	root: {
@@ -16,7 +18,8 @@ const styles = (theme) => ({
 	},
 
 });
-  
+
+// ----------------------------------------------------------------------------  
 class FilesTree extends React.Component {
 
 	static propTypes = {
@@ -44,6 +47,12 @@ class FilesTree extends React.Component {
 		}
 	}
 
+	/**
+	 * Tree items renderer. Renders the tree items from the list who have
+	 * the parent "parentRelPath".
+	 * @param {*} dirItems 
+	 * @param {*} parentRelPath 
+	 */
 	renderDirContent(dirItems, parentRelPath = null){
 		
 		let ritorno = [];
@@ -60,6 +69,7 @@ class FilesTree extends React.Component {
 				else return 1;
 			}
 
+			// Alphabetical sort
 			if (a.name > b.name) return 1;
 			else if (a.name < b.name) return -1;
 			else return 0;
@@ -91,7 +101,7 @@ class FilesTree extends React.Component {
 	}
 
 	/**
-	 * Callback selezione nodo.
+	 * Node selection callback.
 	 */
 	onNodeSelect = (event, value) => {
 		let fileObject = this.state.fileList.find(item => item.relPath === value);
@@ -102,7 +112,7 @@ class FilesTree extends React.Component {
 
 	render(){
 
-		// Classi per gli stili custom
+		// Custom styles classnames
 		const {classes} = this.props;
 
 		return (

@@ -12,7 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import * as FileUtilities from './FileUtilities';
 
-// Costruzione stili per home -------------------------------------------------
+// Component styles -----------------------------------------------------------
 
 const headerHeight = 45;
 const menuWidth = 250;
@@ -53,9 +53,6 @@ const styles = (theme) => ({
 		left: menuWidth+5,
 		right: 0,
 		bottom: 0,
-
-		//overflowX: "auto",
-		//overflowY: "auto"	
 	},
 
 });
@@ -124,42 +121,42 @@ class App extends React.Component {
 
 	render(){
 
-		// Classi per gli stili custom
+		// Custom styles classnames
 		const {classes} = this.props;
 
 		return (
 
 			<React.Fragment>
 
-			<CssBaseline />
+				<CssBaseline />
 
-			<div className={classes.headerDiv}>
-				<Toolbar variant="dense">
-					<IconButton edge="start" color="inherit" aria-label="menu">
-						<MenuIcon />
-					</IconButton>
-					<Typography variant="h6" color="inherit">
-						Charts Viewer
-					</Typography>
-				</Toolbar>
-			</div>
+				<div className={classes.headerDiv}>
+					<Toolbar variant="dense">
+						<IconButton edge="start" color="inherit" aria-label="menu">
+							<MenuIcon />
+						</IconButton>
+						<Typography variant="h6" color="inherit">
+							Charts Viewer
+						</Typography>
+					</Toolbar>
+				</div>
 
-			<div className={classes.treeDiv}>
-				<FilesTree 
-					fileList={this.state.fileList}
-					setSelectedNode={this.setSelectedNode}
-				/>
-			</div>
-
-			<div className={classes.viewerDiv}>
-				{
-					this.state.fileObject &&
-					<Viewer 
-						fileObject={this.state.fileObject}
-						basePath={this.state.basePath}
+				<div className={classes.treeDiv}>
+					<FilesTree 
+						fileList={this.state.fileList}
+						setSelectedNode={this.setSelectedNode}
 					/>
-				}
-			</div>
+				</div>
+
+				<div className={classes.viewerDiv}>
+					{
+						this.state.fileObject &&
+						<Viewer 
+							fileObject={this.state.fileObject}
+							basePath={this.state.basePath}
+						/>
+					}
+				</div>
 
 			</React.Fragment>
 
