@@ -24,9 +24,28 @@ export default class Viewer extends React.Component {
             filePath: props.filePath
 		}
 
-		this.viewerDiv = null;
+		this.viewerDiv = React.createRef();
 		
 	}
+
+	componentDidMount() {
+
+		// NB: il listener sulla rotella del mouse deve essere creato alla vecchia maniera
+		// sul DOM per poter utilizzare l'opzione passive a false. Questa è resa necessaria 
+		// da un recente update di Chrome che considera i movimenti della rotella come passivi, 
+		// e impedisce il preventDefault a livello di documento.
+		if (this.viewerDiv.current) {
+			this.viewerDiv.current.addEventListener('mousewheel', this.handleWheel, { passive: false});
+		}
+
+	}
+
+	componentWillUnmount() {
+		if (this.viewerDiv.current) {
+			this.viewerDiv.current.removeEventListener('mousewheel', this.handleWheel);
+		}
+	}	
+
 	
 	componentDidUpdate(prevProps, prevState, snapshot){
 		if (this.props.filePath !== this.state.filePath){
@@ -38,12 +57,58 @@ export default class Viewer extends React.Component {
 		}
 	}
 
+	/**
+	 * Callback caricamento PDF.
+	 */
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ 
 			numPages,
 			pageNumber: 1
 		});
-    }
+	}
+	
+	/**
+	 * Callback gestione rotella mouse su viewer.
+	 * Modifica la scalatura del documento.
+	 */
+	handleWheel = (e) => {
+		
+		e.preventDefault();
+
+		let deltaScale = - e.deltaY / 100. / 5.;
+		let newScale = this.state.scale + deltaScale;
+
+		newScale = Math.max(newScale, 0.1);
+		newScale = Math.min(newScale, 10);
+
+		this.setState({scale: newScale})
+
+	}	
+
+	/**
+	 * Callback gestione movimento mouse sul viewer.
+	 * Gestisce drag.
+	 */
+	handleMouseMove = (e) => {
+
+		if (this.state.dragging === false) return;
+
+		let div = this.viewerDiv.current;
+		if (div == null) return;
+		div.scrollTo(
+			div.scrollLeft - e.movementX,
+			div.scrollTop - e.movementY
+		)
+
+	}
+
+	enableDrag = () => {
+		this.setState({dragging: true});
+	}
+
+	disableDrag = () => {
+		this.setState({dragging: false});
+	}
 
     render() {
 
@@ -65,12 +130,12 @@ export default class Viewer extends React.Component {
 					}}
 				>
 					Path: {this.state.filePath}
-					<Button onClick={() => this.setState({pageNumber: this.state.pageNumber + 1})}>Next</Button>
-					<Button onClick={() => this.setState({scale: this.state.scale + 0.1})}>Zoom+</Button>					
+					<Button onClick={() => this.setState({pageNumber: Math.max(this.state.pageNumber - 1, 0)})}>Prev</Button>				
+					<Button onClick={() => this.setState({pageNumber: Math.min(this.state.pageNumber + 1, this.state.numPages)})}>Next</Button>				
 				</div>
 
 				<div
-					ref={ref => this.viewerDiv = ref}
+					ref={this.viewerDiv}
 					style={{
 						position: "absolute",
 						top: headerHeight,
@@ -78,39 +143,47 @@ export default class Viewer extends React.Component {
 						left: 0,
 						right: 0,
 						overflowX: "auto",
-						overflowY: "auto"
+						overflowY: "auto",
+						display:'flex',
+						flexDirection: "column",
 					}}
-					onMouseMove={e => {
 
-						let div = this.viewerDiv;
-						if (div == null) return;
-						div.scrollTo(
-							div.scrollLeft + e.movementX,
-							div.scrollTop + e.movementY
-						)
-
+					onMouseMove={this.handleMouseMove}
+					onMouseDown={e => {
+						// impedisce la selezione accidentale di testo nel pdf
+						e.preventDefault();
+						this.enableDrag();
 					}}
+					onMouseUp={this.disableDrag}
+					onMouseLeave={this.disableDrag}
 				>
 
-                <Document
-                    file={this.state.filePath}
-                    onLoadSuccess={this.onDocumentLoadSuccess}
-                    onLoadError={(error) => alert('Error while loading document! ' + error.message)}
-                    options={{
-                        // Gestione font mancanti
-                        disableFontFace: false
-                    }}
-                >
+				<div style={{
+					alignSelf: "center"
+				}}>
 
-					<Page
-						key={`page_${this.state.pageNumber + 1}`}
-						pageNumber={this.state.pageNumber}
-						scale={this.state.scale}
-					/>
+					<Document
+						file={this.state.filePath}
+						onLoadSuccess={this.onDocumentLoadSuccess}
+						onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+						options={{
+							// Gestione font mancanti
+							disableFontFace: false
+						}}
+					>
 
-                </Document>
+						<Page
+							key={`page_${this.state.pageNumber + 1}`}
+							pageNumber={this.state.pageNumber}
+							scale={this.state.scale}
+						/>
 
-                <p>Page {pageNumber} of {numPages}</p>
+					</Document>
+
+					<p>Page {pageNumber} of {numPages}</p>
+
+				</div>
+
 				</div>
 
             </React.Fragment>
