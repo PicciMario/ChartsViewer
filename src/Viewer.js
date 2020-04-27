@@ -21,7 +21,8 @@ export default class Viewer extends React.Component {
             numPages: null,
 			pageNumber: 1,
 			scale: 1.0,
-            filePath: props.filePath
+			filePath: props.filePath,
+			dragging: false
 		}
 
 		this.viewerDiv = React.createRef();

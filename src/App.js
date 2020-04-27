@@ -77,7 +77,7 @@ class App extends React.Component {
 		this.state = {
 
 			// Percorso assoluto della cartella contenente i documenti
-			fileFolder: 'C:/Users/mario/Documents/charts-viewer/charts',
+			fileFolder: '',
 
 			// Percorso assoluto del file attualmente aperto
 			filePath: null
@@ -86,13 +86,36 @@ class App extends React.Component {
 	}
 
 	componentDidMount(){
-		
-		let fileList = this._readDirSubNodes(); 
-		console.log("File list", fileList);
 
-		this.setState({
-			fileList
+		// Esperimenti lettura configurazione
+
+		const remote = require('electron').remote;
+		const app = remote.app;		
+		console.log(app.getPath('userData'))		
+
+		let configFile = path.join(app.getPath('userData'), 'prova.json');
+
+		let data = JSON.stringify({
+			fileFolder: 'C:/Users/m.piccinelli/Documents/Progetti/ChartsViewer/charts'
 		});
+		fs.writeFileSync(configFile, data);
+
+		let readData = JSON.parse(fs.readFileSync(configFile));
+		console.log(readData);
+		
+		this.setState(
+			{
+				fileFolder: readData.fileFolder
+			},
+			() => {
+				let fileList = this._readDirSubNodes(); 
+				console.log("File list", fileList);
+		
+				this.setState({
+					fileList
+				});
+			}
+		)
 
 	}
 
@@ -109,12 +132,30 @@ class App extends React.Component {
 
 		let content = [];
 
-		fs.readdirSync(parentFullPath).forEach(dirElement => {
+		let readFiles = [];
+		
+		try{
+			readFiles = fs.readdirSync(parentFullPath);
+		}
+		catch (err){
+			console.log("Errore lettura dir", parentFullPath, err);
+			return [];
+		}
+
+		readFiles.forEach(dirElement => {
 
 			let elementRelPath = path.join(parentRelPath || "", dirElement)
 			let elementFullPath = path.join(fileFolder, elementRelPath)
 
-			let stats = fs.statSync(elementFullPath);
+			let stats;
+			try{
+				stats = fs.statSync(elementFullPath);
+			}
+			catch (err){
+				console.log("Errore lettura stats file", elementFullPath, err);
+				return;
+			}
+
 			if (stats.isDirectory()){
 				let newNode = {
 					parentRelPath: parentRelPath,
@@ -184,7 +225,10 @@ class App extends React.Component {
 
 
 			<div className={classes.viewerDiv}>
-				<Viewer filePath={this.state.filePath}/>
+				{
+					this.state.filePath &&
+					<Viewer filePath={this.state.filePath}/>
+				}
 			</div>
 
 			</React.Fragment>
