@@ -10,6 +10,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import * as FileUtilities from './FileUtilities';
 
 // Costruzione stili per home -------------------------------------------------
 
@@ -104,7 +105,7 @@ class App extends React.Component {
 				basePath: readData.basePath
 			},
 			() => {
-				let fileList = this._readDirSubNodes(); 
+				let fileList = FileUtilities.readDirTree(this.state.basePath);
 				console.log("File list", fileList);
 		
 				this.setState({
@@ -114,70 +115,6 @@ class App extends React.Component {
 		)
 
 	}
-
-	/**
-	 * Restituisce un array rappresentante il contenuto della cartella passata
-	 * come parametro (chiamata ricorsivamente).
-	 * @param {*} dirNode 
-	 */
-	_readDirSubNodes(dirNode){
-		
-		let {basePath} = this.state;
-		let parentRelPath = dirNode != null ? dirNode.relPath : null;
-		let parentFullPath = path.join(basePath, parentRelPath || "")
-
-		let content = [];
-
-		let readFiles = [];
-		
-		try{
-			readFiles = fs.readdirSync(parentFullPath);
-		}
-		catch (err){
-			console.log("Errore lettura dir", parentFullPath, err);
-			return [];
-		}
-
-		readFiles.forEach(dirElement => {
-
-			let elementRelPath = path.join(parentRelPath || "", dirElement)
-			let elementFullPath = path.join(basePath, elementRelPath)
-
-			let stats;
-			try{
-				stats = fs.statSync(elementFullPath);
-			}
-			catch (err){
-				console.log("Errore lettura stats file", elementFullPath, err);
-				return;
-			}
-
-			if (stats.isDirectory()){
-				let newNode = {
-					parentRelPath: parentRelPath,
-					name: dirElement, 
-					relPath: elementRelPath, 
-					type: "dir"
-				};
-				content.push(newNode)
-				this._readDirSubNodes(newNode).forEach(item => content.push(item))
-
-			}
-			else {
-				let newNode = {
-					parentRelPath: parentRelPath,
-					name: dirElement, 
-					relPath: elementRelPath, 
-					type: "file"
-				};
-				content.push(newNode);
-			}
-
-		})
-
-		return content;
-
-	}		
 
 	setSelectedNode = (selNode) => {
 		this.setState({

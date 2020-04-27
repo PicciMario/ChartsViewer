@@ -116,15 +116,13 @@ export default class Viewer extends React.Component {
 
     render() {
 
-		console.log("render", this.state)
-
 		if (
 			this.state.basePath == null
 			|| this.state.fileObject == null
 			|| this.state.fileObject.type !== 'file'
 		) return null;
 
-		const { pageNumber, numPages } = this.state;
+		const { pageNumber, numPages, fileObject, basePath, scale } = this.state;
 		
 		const headerHeight = 50;
 
@@ -141,9 +139,9 @@ export default class Viewer extends React.Component {
 						right: 0
 					}}
 				>
-					Path: {this.state.fileObject.name}
-					<Button onClick={() => this.setState({pageNumber: Math.max(this.state.pageNumber - 1, 0)})}>Prev</Button>				
-					<Button onClick={() => this.setState({pageNumber: Math.min(this.state.pageNumber + 1, this.state.numPages)})}>Next</Button>				
+					Path: {fileObject.name}
+					<Button onClick={() => this.setState({pageNumber: Math.max(pageNumber - 1, 0)})}>Prev</Button>				
+					<Button onClick={() => this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})}>Next</Button>				
 				</div>
 
 				<div
@@ -175,7 +173,7 @@ export default class Viewer extends React.Component {
 				}}>
 
 					<Document
-						file={path.join(this.state.basePath, this.state.fileObject.relPath)}
+						file={path.join(basePath, fileObject.relPath)}
 						onLoadSuccess={this.onDocumentLoadSuccess}
 						onLoadError={(error) => alert('Error while loading document! ' + error.message)}
 						options={{
@@ -185,9 +183,9 @@ export default class Viewer extends React.Component {
 					>
 
 						<Page
-							key={`page_${this.state.pageNumber + 1}`}
-							pageNumber={this.state.pageNumber}
-							scale={this.state.scale}
+							key={`page_${pageNumber + 1}`}
+							pageNumber={pageNumber}
+							scale={scale}
 						/>
 
 					</Document>
