@@ -11,10 +11,6 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
-// Modifiche per funzionamento worker react-pdf
-import { pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `http://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-
 // Costruzione stili per home -------------------------------------------------
 
 const headerHeight = 45;
@@ -96,7 +92,7 @@ class App extends React.Component {
 		let configFile = path.join(app.getPath('userData'), 'prova.json');
 
 		let data = JSON.stringify({
-			fileFolder: 'C:/Users/m.piccinelli/Documents/Progetti/ChartsViewer/charts'
+			fileFolder: 'C:/Users/mario/Documents/charts-viewer/charts'
 		});
 		fs.writeFileSync(configFile, data);
 

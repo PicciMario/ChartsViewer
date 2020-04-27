@@ -160,7 +160,7 @@ export default class Viewer extends React.Component {
 				>
 
 				<div style={{
-					alignSelf: "center"
+					alignSelf: "normal"
 				}}>
 
 					<Document
@@ -186,8 +186,9 @@ export default class Viewer extends React.Component {
 				</div>
 
 				</div>
-
+			
             </React.Fragment>
+			
         );
 
     }

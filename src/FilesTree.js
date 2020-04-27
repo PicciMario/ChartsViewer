@@ -96,6 +96,7 @@ class FilesTree extends React.Component {
 		const {classes} = this.props;
 
 		return (
+
 			<TreeView
 				className={classes.root}
 				defaultCollapseIcon={<ExpandMoreIcon />}
@@ -108,6 +109,7 @@ class FilesTree extends React.Component {
 				{this.renderDirContent(this.state.fileList)}
 
 			</TreeView>
+
 		);
 	}
 }
