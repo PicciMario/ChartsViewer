@@ -10,14 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import * as FileUtilities from './FileUtilities';
 import globalConfig from './GlobalConfig';
-
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import ConfigDialog from './ConfigDialog';
 
 // Component styles -----------------------------------------------------------
 
@@ -84,7 +77,7 @@ class App extends React.Component {
 			fileObject: null
 		}
 
-		this.refs.configForm = React.createRef();
+		//this.refs.configForm = React.createRef();
 
 	}
 
@@ -115,11 +108,11 @@ class App extends React.Component {
 		})
 	}
 
-	handleClose = () => {
+	handleConfigDialogClose = () => {
 		this.setState({dialogOpen: false});
 	}
 
-	handleConfigSave = (e) => {
+	handleConfigDialogSubmit = (e) => {
 		console.log(e)
 		this.setState({dialogOpen: false});
 	}	
@@ -163,31 +156,11 @@ class App extends React.Component {
 					}
 				</div>
 
-				<Dialog open={this.state.dialogOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth="true">
-					<DialogTitle id="form-dialog-title">Application configuration.</DialogTitle>
-					<DialogContent>
-						<DialogContentText>
-							The configuration is saved locally per-user.
-						</DialogContentText>
-						<TextField
-							autoFocus
-							margin="dense"
-							id="basePath"
-							label="Base document path"
-							helperText="Directory which contains the documents."
-							defaultValue={globalConfig.get("basePath")}
-							fullWidth
-						/>
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={this.handleClose} color="primary">
-							Cancel
-						</Button>
-						<Button onClick={this.handleConfigSave} color="primary">
-							Save
-						</Button>
-					</DialogActions>
-				</Dialog>				
+				<ConfigDialog
+					open={this.state.dialogOpen} 
+					onClose={this.handleConfigDialogClose}
+					onSubmit={this.handleConfigDialogSubmit}
+				/>
 
 			</React.Fragment>
 
