@@ -64,7 +64,6 @@ class Viewer extends React.Component {
 			pageNumber: 1,
 			scale: 1.0,
 			fileObject: props.fileObject,
-			basePath: props.basePath,
 			dragging: false
 		}
 
@@ -172,12 +171,13 @@ class Viewer extends React.Component {
 		const {classes} = this.props;		
 
 		if (
-			this.state.basePath == null
+			this.props.basePath == null
 			|| this.state.fileObject == null
 			|| this.state.fileObject.type !== 'file'
 		) return null;
 
-		const { pageNumber, numPages, fileObject, basePath, scale } = this.state;
+		const { pageNumber, numPages, fileObject, scale } = this.state;
+		const { basePath } = this.props;
 
 		console.log({pageNumber, numPages})
 

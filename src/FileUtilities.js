@@ -7,8 +7,6 @@ import fs from 'fs'
  * @param {*} dirNode 
  */
 export function readDirTree(basePath, dirNode = null){
-
-	console.log(basePath, dirNode)
 	
 	let parentRelPath = dirNode != null ? dirNode.relPath : null;
 	let parentFullPath = path.join(basePath, parentRelPath || "")

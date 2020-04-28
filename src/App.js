@@ -8,7 +8,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import * as FileUtilities from './FileUtilities';
 import globalConfig from './GlobalConfig';
 import ConfigDialog from './ConfigDialog';
 
@@ -75,9 +74,8 @@ class App extends React.Component {
 
 			// Percorso assoluto del file attualmente aperto
 			fileObject: null
-		}
 
-		//this.refs.configForm = React.createRef();
+		}
 
 	}
 
@@ -85,19 +83,11 @@ class App extends React.Component {
 
 		//globalConfig.set('basePath', 'C:/Users/m.piccinelli/Documents/Progetti/ChartsViewer/charts');
 
-		
 		this.setState(
 			{
-				basePath: globalConfig.get("basePath")
+				basePath: globalConfig.get("basePath", null)
 			},
-			() => {
-				let fileList = FileUtilities.readDirTree(this.state.basePath);
-				console.log("File list", fileList);
-		
-				this.setState({
-					fileList
-				});
-			}
+			this.updateFileTree
 		)
 
 	}
@@ -112,9 +102,32 @@ class App extends React.Component {
 		this.setState({dialogOpen: false});
 	}
 
-	handleConfigDialogSubmit = (e) => {
-		console.log(e)
-		this.setState({dialogOpen: false});
+	handleConfigDialogSubmit = (keys) => {
+
+		let newState = {dialogOpen: false};
+
+		if (keys != null){
+			
+			Object.keys(keys).forEach(key => {
+
+				globalConfig.set(key, keys[key]);
+
+				// Upgrade basePath in component's state
+				// to force refresh.
+				if (
+					key === 'basePath'
+					&& keys[key] !== this.state.basePath
+				) {
+					newState[key] = keys[key];
+					newState.fileObject = null;
+				}
+
+			})
+
+		}
+
+		this.setState(newState);
+
 	}	
 
 	render(){
@@ -141,7 +154,7 @@ class App extends React.Component {
 
 				<div className={classes.treeDiv}>
 					<FilesTree 
-						fileList={this.state.fileList}
+						basePath={this.state.basePath}
 						setSelectedNode={this.setSelectedNode}
 					/>
 				</div>

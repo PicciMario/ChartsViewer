@@ -5,6 +5,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import * as FileUtilities from './FileUtilities';
 
 // Component styles -----------------------------------------------------------
 
@@ -30,28 +31,50 @@ class FilesTree extends React.Component {
 
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
-		fileList: PropTypes.array,
+		basePath: PropTypes.string,
 		setSelectedNode: PropTypes.func.isRequired
 	};
 
 	static defaultPropTypes = {
-		fileList: []
+		basePath: null
 	}
 
 	constructor(props){
+		
 		super(props);
+		
 		this.state = {
-			fileList: props.fileList
+			fileList: []
 		}
+
 	}
 
 	componentDidUpdate(prevProps, prevState){
-		if (this.props.fileList !== prevProps.fileList){
-			this.setState({
-				fileList: this.props.fileList
-			})
+		if (this.props.basePath !== prevProps.basePath){
+			this.updateFileTree();
 		}
 	}
+
+	updateFileTree(){
+
+		if (this.props.basePath == null) return;
+
+		console.log("Calling updateFileTree...")
+
+		new Promise((res, rej) => {
+			let fileList = FileUtilities.readDirTree(this.props.basePath);
+			res(fileList);
+		})
+		.then((fileList) => {
+			console.log("Read file list", fileList);
+			this.setState({
+				fileList
+			});			
+		})
+
+		console.log("End call updateFileTree...")
+
+	}	
 
 	/**
 	 * Tree items renderer. Renders the tree items from the list who have

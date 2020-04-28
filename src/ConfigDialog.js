@@ -64,12 +64,23 @@ export default class ConfigDialog extends React.Component{
 
     handleBasePathChange = (e) => {
         this.setState({basePath: e.target.value})
-    }
+	}
+	
+	handleSubmit = (e) => {
+		let keys = {
+			basePath: this.state.basePath
+		}
+		this.props.onSubmit(keys);
+	}
+
+	handleClose = (e) => {
+		this.props.onClose();
+	}
 
     render(){
 
         return (
-            <Dialog open={this.state.open} onClose={this.props.onClose} aria-labelledby="form-dialog-title" fullWidth="true">
+            <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth="true">
                 <DialogTitle id="form-dialog-title">Application configuration.</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -87,10 +98,10 @@ export default class ConfigDialog extends React.Component{
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.props.onClose} color="primary">
+                    <Button onClick={this.handleClose} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={this.props.onSubmit} color="primary">
+                    <Button onClick={this.handleSubmit} color="primary">
                         Save
                     </Button>
                 </DialogActions>
