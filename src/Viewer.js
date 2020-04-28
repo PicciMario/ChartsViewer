@@ -4,10 +4,12 @@ import { Document, Page } from 'react-pdf';
 import { Button } from '@material-ui/core';
 import path from 'path';
 import { withStyles } from '@material-ui/core/styles';
+import {Slider} from '@material-ui/core';
 
 // Component styles -----------------------------------------------------------
 
 const headerHeight = 50;
+const pageSliderWidth = 50;
 
 const styles = (theme) => ({
 
@@ -23,12 +25,19 @@ const styles = (theme) => ({
 		position: "absolute",
 		top: headerHeight,
 		bottom: 0,
-		left: 0,
+		left: pageSliderWidth,
 		right: 0,
 		overflowX: "auto",
 		overflowY: "auto",
 		display:'flex',
-		flexDirection: "column",
+		flexDirection: "column"
+	},
+
+	pageSliderDiv: {
+		position: "absolute",
+		left: 5,
+		top: headerHeight + 25,
+		bottom: 30
 	}
 
 });
@@ -170,15 +179,32 @@ class Viewer extends React.Component {
 
 		const { pageNumber, numPages, fileObject, basePath, scale } = this.state;
 
+		console.log({pageNumber, numPages})
+
         return (
             
             <React.Fragment>
+
+                <div className={classes.pageSliderDiv}>
+					<Slider
+						value={this.state.numPages - this.state.pageNumber + 1}
+						orientation="vertical"
+						aria-labelledby="discrete-slider-small-steps"
+						step={1}
+						marks
+						min={1}
+						max={this.state.numPages}
+						scale={(val) =>  this.state.numPages - val + 1}
+						valueLabelDisplay="on"
+						onChange={(e, val) => {this.setState({pageNumber: this.state.numPages - val + 1})}}
+					/>			
+				</div>
 
                 <div className={classes.headerDiv}>
 					Path: {fileObject.name}
 					<Button onClick={() => this.setState({pageNumber: Math.max(pageNumber - 1, 0)})}>Prev</Button>				
 					<Button onClick={() => this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})}>Next</Button>				
-				</div>
+				</div>				
 
 				<div
 					ref={this.viewerDiv}
@@ -188,7 +214,7 @@ class Viewer extends React.Component {
 					onMouseUp={this.disableDrag}
 					onMouseLeave={this.disableDrag}
 				>
-
+					
 					<Document
 						file={path.join(basePath, fileObject.relPath)}
 						onLoadSuccess={this.onDocumentLoadSuccess}
