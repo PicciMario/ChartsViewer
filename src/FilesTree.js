@@ -17,6 +17,12 @@ const styles = (theme) => ({
 		maxWidth: 400,
 	},
 
+	treeItemLabel: {
+		overflow: "hidden",
+		textOverflow: "ellipsis",
+		whiteSpace: "nowrap"
+	}
+
 });
 
 // ----------------------------------------------------------------------------  
@@ -55,6 +61,9 @@ class FilesTree extends React.Component {
 	 */
 	renderDirContent(dirItems, parentRelPath = null){
 		
+		// Custom styles classnames
+		const {classes} = this.props;
+
 		let ritorno = [];
 
 		if (dirItems == null) return ritorno;
@@ -79,12 +88,30 @@ class FilesTree extends React.Component {
 			switch (dirItem.type){
 
 				case "file":
-					ritorno.push(<TreeItem key={dirItem.relPath} nodeId={dirItem.relPath} label={dirItem.name}/>);
+					ritorno.push(
+						<TreeItem 
+							key={dirItem.relPath} 
+							nodeId={dirItem.relPath} 
+							label={dirItem.name}
+							classes={{
+								label: classes.treeItemLabel
+							}}
+							title={dirItem.relPath}
+						/>
+					);
 					break;
 
 				case "dir":
 					ritorno.push(
-						<TreeItem key={dirItem.relPath} nodeId={dirItem.relPath} label={dirItem.name}>
+						<TreeItem 
+							key={dirItem.relPath} 
+							nodeId={dirItem.relPath} 
+							label={dirItem.name}
+							classes={{
+								label: classes.treeItemLabel
+							}}	
+							title={dirItem.relPath}						
+						>
 							{this.renderDirContent(dirItems, dirItem.relPath)}
 						</TreeItem>
 					);

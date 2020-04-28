@@ -84,6 +84,8 @@ class App extends React.Component {
 			fileObject: null
 		}
 
+		this.refs.configForm = React.createRef();
+
 	}
 
 	componentDidMount(){
@@ -116,6 +118,11 @@ class App extends React.Component {
 	handleClose = () => {
 		this.setState({dialogOpen: false});
 	}
+
+	handleConfigSave = (e) => {
+		console.log(e)
+		this.setState({dialogOpen: false});
+	}	
 
 	render(){
 
@@ -176,7 +183,7 @@ class App extends React.Component {
 						<Button onClick={this.handleClose} color="primary">
 							Cancel
 						</Button>
-						<Button onClick={this.handleClose} color="primary">
+						<Button onClick={this.handleConfigSave} color="primary">
 							Save
 						</Button>
 					</DialogActions>
