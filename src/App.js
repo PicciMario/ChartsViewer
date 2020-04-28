@@ -4,13 +4,20 @@ import Viewer from './Viewer';
 import FilesTree from './FilesTree';
 import { withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import path from 'path'
-import fs from 'fs'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import * as FileUtilities from './FileUtilities';
+import globalConfig from './GlobalConfig';
+
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 // Component styles -----------------------------------------------------------
 
@@ -81,25 +88,12 @@ class App extends React.Component {
 
 	componentDidMount(){
 
-		// Esperimenti lettura configurazione
+		//globalConfig.set('basePath', 'C:/Users/m.piccinelli/Documents/Progetti/ChartsViewer/charts');
 
-		const remote = require('electron').remote;
-		const app = remote.app;		
-		console.log(app.getPath('userData'))		
-
-		let configFile = path.join(app.getPath('userData'), 'prova.json');
-
-		let data = JSON.stringify({
-			basePath: 'C:/Users/mario/Documents/charts-viewer/charts'
-		});
-		fs.writeFileSync(configFile, data);
-
-		let readData = JSON.parse(fs.readFileSync(configFile));
-		console.log(readData);
 		
 		this.setState(
 			{
-				basePath: readData.basePath
+				basePath: globalConfig.get("basePath")
 			},
 			() => {
 				let fileList = FileUtilities.readDirTree(this.state.basePath);
@@ -119,6 +113,10 @@ class App extends React.Component {
 		})
 	}
 
+	handleClose = () => {
+		this.setState({dialogOpen: false});
+	}
+
 	render(){
 
 		// Custom styles classnames
@@ -132,7 +130,7 @@ class App extends React.Component {
 
 				<div className={classes.headerDiv}>
 					<Toolbar variant="dense">
-						<IconButton edge="start" color="inherit" aria-label="menu">
+						<IconButton edge="start" color="inherit" aria-label="menu" onClick={() => {this.setState({dialogOpen: !this.state.dialogOpen})}}>
 							<MenuIcon />
 						</IconButton>
 						<Typography variant="h6" color="inherit">
@@ -157,6 +155,32 @@ class App extends React.Component {
 						/>
 					}
 				</div>
+
+				<Dialog open={this.state.dialogOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth="true">
+					<DialogTitle id="form-dialog-title">Application configuration.</DialogTitle>
+					<DialogContent>
+						<DialogContentText>
+							The configuration is saved locally per-user.
+						</DialogContentText>
+						<TextField
+							autoFocus
+							margin="dense"
+							id="basePath"
+							label="Base document path"
+							helperText="Directory which contains the documents."
+							defaultValue={globalConfig.get("basePath")}
+							fullWidth
+						/>
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={this.handleClose} color="primary">
+							Cancel
+						</Button>
+						<Button onClick={this.handleClose} color="primary">
+							Save
+						</Button>
+					</DialogActions>
+				</Dialog>				
 
 			</React.Fragment>
 
