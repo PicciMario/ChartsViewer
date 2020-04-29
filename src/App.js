@@ -10,6 +10,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import globalConfig from './GlobalConfig';
 import ConfigDialog from './ConfigDialog';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
 
 // Component styles -----------------------------------------------------------
 
@@ -105,10 +107,31 @@ class App extends React.Component {
 		})
 	}
 
+	/**
+	 * Handles opening the config dialog.
+	 * (also closes main menu).
+	 */
+	handleConfigDialogOpen = () => {
+		this.setState({
+			dialogOpen: !this.state.dialogOpen, 
+			anchorEl: null, 
+			menuOpen: false
+		})
+	}
+
+	/**
+	 * Handles closing the config dialog.
+	 */
 	handleConfigDialogClose = () => {
 		this.setState({dialogOpen: false});
 	}
 
+	/**
+	 * Handles submitting the config dialog. Expects an object
+	 * with the config keys. Saves the keys in the config object
+	 * and, if required (by a change in basePath, for example), 
+	 * updates the component state to force a refresh.
+	 */
 	handleConfigDialogSubmit = (keys) => {
 
 		let newState = {dialogOpen: false};
@@ -137,6 +160,35 @@ class App extends React.Component {
 
 	}	
 
+	/**
+	 * Handles opening the main menu.
+	 */
+	handleMenuOpen = (event) => {
+		this.setState({
+			anchorEl: event.currentTarget,
+			menuOpen: true
+		});
+	};
+
+	/**
+	 * Handles closing the main menu.
+	 */
+	handleMenuClose = () => {
+		this.setState({
+			anchorEl: null,
+			menuOpen: false
+		});
+	};
+
+	/**
+	 * Handles the "quit" option in the main menu.
+	 */
+	handleQuit = () => {
+		require("electron").remote.app.quit();
+	}
+
+	// ------------------------------------------------------------------------
+
 	render(){
 
 		// Custom styles classnames
@@ -150,12 +202,39 @@ class App extends React.Component {
 
 				<div className={classes.headerDiv}>
 					<Toolbar variant="dense">
-						<IconButton edge="start" color="inherit" aria-label="menu" onClick={() => {this.setState({dialogOpen: !this.state.dialogOpen})}}>
-							<MenuIcon />
-						</IconButton>
+
+						<div>
+
+							<IconButton
+								aria-label="account of current user"
+								aria-controls="menu-appbar"
+								aria-haspopup="true"
+								onClick={this.handleMenuOpen}
+								color="inherit"
+							>
+								<MenuIcon />
+							</IconButton>	
+
+							<Menu
+								id="menu-appbar"
+								anchorEl={this.state.anchorEl}
+								getContentAnchorEl={null}
+								keepMounted
+								anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+								transformOrigin={{ vertical: "top", horizontal: "center" }}
+								open={this.state.menuOpen}
+								onClose={this.handleMenuClose}
+							>
+								<MenuItem onClick={this.handleConfigDialogOpen}>Configure...</MenuItem>
+								<MenuItem onClick={this.handleQuit}>Quit</MenuItem>
+							</Menu>	
+
+						</div>
+
 						<Typography variant="h6" color="inherit">
 							Charts Viewer
 						</Typography>
+
 					</Toolbar>
 				</div>
 
