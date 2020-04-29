@@ -178,7 +178,7 @@ class Viewer extends React.Component {
 			this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})
 		}
 		else {
-			this.setState({pageNumber: Math.max(pageNumber - 1, 0)})
+			this.setState({pageNumber: Math.max(pageNumber - 1, 1)})
 		}
 
 	}	
