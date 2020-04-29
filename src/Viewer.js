@@ -78,6 +78,13 @@ class Viewer extends React.Component {
 
 		this.viewerDiv = React.createRef();
 		this.sliderDiv = React.createRef();
+
+		/*
+		Set to true whenever I set a new fileobject in the store, and put
+		to false after the first page render. Used to to run operations after
+		the first page render, such as managing the initial scroll position.
+		*/
+		this.justLoaded = false;
 		
 	}
 
@@ -95,6 +102,7 @@ class Viewer extends React.Component {
 		}
 
 		// This runs when the first document is selected after opening the app.
+		this.justLoaded = true;
 		this.setState({
 			fileObject: this.props.fileObject,
 			pageNumber: this.props.fileObject.page || 1,
@@ -118,11 +126,15 @@ class Viewer extends React.Component {
 		// This runs when you select a new file on the tree, anytime BUT the
 		// first one (that is taken care of in componentDidMount).
 		if (this.props.fileObject !== this.state.fileObject){
+
+			this.justLoaded = true;
+
 			this.setState({
 				fileObject: this.props.fileObject,
 				pageNumber: this.props.fileObject.page || 1,
 				scale: this.props.fileObject.scale || 1.0,
 			})
+
 		}
 
 	}
@@ -141,15 +153,18 @@ class Viewer extends React.Component {
 	 */
 	handlePageRenderSuccess = (() => {
 
-		let {scrollX, scrollY} = this.state.fileObject;
-		if (scrollX != null || scrollY != null){
+		if (this.justLoaded){
+			this.justLoaded = false;
+			let {scrollX, scrollY} = this.state.fileObject;
+			if (scrollX != null || scrollY != null){
 
-			let div = this.viewerDiv.current;
-			if (div == null) return;	
-			div.scrollTo(
-				scrollX || 0,
-				scrollY || 0
-			)	
+				let div = this.viewerDiv.current;
+				if (div == null) return;	
+				div.scrollTo(
+					scrollX || 0,
+					scrollY || 0
+				)	
+			}
 		}
 
 	})
@@ -234,12 +249,6 @@ class Viewer extends React.Component {
 		// Custom styles classnames
 		const {classes} = this.props;		
 
-		if (
-			this.props.basePath == null
-			|| this.state.fileObject == null
-			|| this.state.fileObject.type !== 'file'
-		) return null;
-
 		const { pageNumber, numPages, fileObject, scale } = this.state;
 		const { basePath } = this.props;
 
@@ -255,7 +264,7 @@ class Viewer extends React.Component {
             <React.Fragment>
 
                 <div className={classes.pageSliderDiv} ref={this.sliderDiv}>
-
+				
 					{/* Actual page number. */}
 					<span style={{alignSelf: 'center', marginBottom: 10}}>{this.state.pageNumber}</span>
 
@@ -280,7 +289,7 @@ class Viewer extends React.Component {
 
 				</div>
 
-                <div className={classes.headerDiv}>
+				<div className={classes.headerDiv}>
 					Scale: {this.state.scale}, Scroll: {scrollX}:{scrollY}
 					<Button onClick={() => this.setState({pageNumber: Math.max(pageNumber - 1, 0)})}>Prev</Button>				
 					<Button onClick={() => this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})}>Next</Button>				
@@ -294,27 +303,45 @@ class Viewer extends React.Component {
 					onMouseUp={this.disableDrag}
 					onMouseLeave={this.disableDrag}
 				>
-					
-					<Document
-						file={path.join(basePath, fileObject.relPath)}
-						onLoadSuccess={this.onDocumentLoadSuccess}
-						onLoadError={(error) => alert('Error while loading document! ' + error.message)}
-						options={{
-							// Missing fonts
-							disableFontFace: false
-						}}
-					>
 
-						<Page
-							key={`page_${pageNumber + 1}`}
-							pageNumber={pageNumber}
-							scale={scale}
-							onRenderSuccess={this.handlePageRenderSuccess}
-						/>
+					{
 
-					</Document>
+						/*
+						The div which contains this has to be renderer everytime, because
+						it is the one to which we attach mousewheel event handlers upon
+						mounting the component. Otherwise we lose the events.
+						Leaving this here because I just wasted like half an hour chasing
+						down my disappearing events.
+						*/
+
+						this.props.basePath != null
+						&& this.state.fileObject != null
+						&& this.state.fileObject.type === 'file'					
+						&&
+						
+						<Document
+							file={path.join(basePath, fileObject.relPath)}
+							onLoadSuccess={this.onDocumentLoadSuccess}
+							onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+							options={{
+								// Missing fonts
+								disableFontFace: false
+							}}
+						>
+
+							<Page
+								key={`page_${pageNumber + 1}`}
+								pageNumber={pageNumber}
+								scale={scale}
+								onRenderSuccess={this.handlePageRenderSuccess}
+							/>
+
+						</Document>
+
+					}
 
 					<p>Page {pageNumber} of {numPages}</p>
+
 
 				</div>
 			
