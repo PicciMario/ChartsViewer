@@ -36,8 +36,20 @@ const styles = (theme) => ({
 	pageSliderDiv: {
 		position: "absolute",
 		left: 5,
-		top: headerHeight + 25,
-		bottom: 30
+		top: headerHeight,
+		bottom: 30,
+		display: 'flex',
+		flexDirection: 'column',
+	},
+
+	pageSliderValueLabel: {
+		left: 'calc(-50% + 20px)',
+		top: 'calc(-50% - 8px)',
+		'& *': {
+			background: 'transparent',
+			color: '#000',
+			fontSize: 12
+		},		
 	}
 
 });
@@ -210,18 +222,27 @@ class Viewer extends React.Component {
             <React.Fragment>
 
                 <div className={classes.pageSliderDiv} ref={this.sliderDiv}>
+
+					<span style={{alignSelf: 'center', marginBottom: 10}}>{this.state.pageNumber}</span>
+
 					<Slider
 						value={this.state.numPages - this.state.pageNumber + 1}
 						orientation="vertical"
 						aria-labelledby="discrete-slider-small-steps"
 						step={1}
-						marks
+						marks={this.state.numPages && this.state.numPages < 500}
 						min={1}
 						max={this.state.numPages}
 						scale={(val) =>  this.state.numPages - val + 1}
-						valueLabelDisplay="on"
+						valueLabelDisplay="auto"
 						onChange={(e, val) => {this.setState({pageNumber: this.state.numPages - val + 1})}}
+						classes={{
+							valueLabel: classes.pageSliderValueLabel
+						}}
 					/>			
+
+					<span style={{alignSelf: 'center', marginTop: 10}}>{this.state.numPages}</span>
+
 				</div>
 
                 <div className={classes.headerDiv}>
