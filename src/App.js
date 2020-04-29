@@ -12,6 +12,12 @@ import globalConfig from './GlobalConfig';
 import ConfigDialog from './ConfigDialog';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 // Component styles -----------------------------------------------------------
 
@@ -75,7 +81,15 @@ class App extends React.Component {
 			basePath: '',
 
 			// Percorso assoluto del file attualmente aperto
-			fileObject: null
+			fileObject: null,
+
+			// True to show config dialog
+			dialogOpen: false,
+
+			// States to manage snackbar
+			snackbarOpen: false,
+			snackbarText: '',
+			snackbarSeverity: "success"
 
 		}
 
@@ -187,6 +201,37 @@ class App extends React.Component {
 		require("electron").remote.app.quit();
 	}
 
+	/**
+	 * Show success snackbar.
+	 * @param text Message to show.
+	 */
+	showSuccess = (text) => {
+		this.setState({
+			snackbarOpen: true,
+			snackbarText: text,
+			snackbarSeverity: "info"
+		})
+	}
+
+	/**
+	 * Show error snackbar.
+	 * @param text Message to show.
+	 */	
+	showError = (text) => {
+		this.setState({
+			snackbarOpen: true,
+			snackbarText: text,
+			snackbarSeverity: "error"
+		})
+	}	
+
+	/**
+	 * Closes snackbar.
+	 */
+	handleSnackbarClose = () => {
+		this.setState({snackbarOpen: false})
+	}
+
 	// ------------------------------------------------------------------------
 
 	render(){
@@ -242,6 +287,8 @@ class App extends React.Component {
 					<FilesTree 
 						basePath={this.state.basePath}
 						setSelectedNode={this.setSelectedNode}
+						showSuccess={this.showSuccess}
+						showError={this.showError}
 					/>
 				</div>
 
@@ -251,6 +298,8 @@ class App extends React.Component {
 						<Viewer 
 							fileObject={this.state.fileObject}
 							basePath={this.state.basePath}
+							showSuccess={this.showSuccess}
+							showError={this.showError}							
 						/>
 					}
 				</div>
@@ -260,6 +309,12 @@ class App extends React.Component {
 					onClose={this.handleConfigDialogClose}
 					onSubmit={this.handleConfigDialogSubmit}
 				/>
+
+				<Snackbar open={this.state.snackbarOpen} autoHideDuration={6000} onClose={this.handleSnackbarClose}>
+					<Alert onClose={this.handleSnackbarClose} severity={this.state.snackbarSeverity}>
+						{this.state.snackbarText}
+					</Alert>
+				</Snackbar>				
 
 			</React.Fragment>
 

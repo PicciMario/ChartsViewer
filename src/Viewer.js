@@ -60,11 +60,15 @@ class Viewer extends React.Component {
 
 	static propTypes = {
 		fileObject: PropTypes.object,
-		basePath: PropTypes.string.isRequired
+		basePath: PropTypes.string.isRequired,
+		showSuccess: PropTypes.func,
+		showError: PropTypes.func
 	};
 
 	static defaultPropTypes = {
-		fileObject: null
+		fileObject: null,
+		showSuccess: () => {},
+		showError: () => {},		
 	}
 
     constructor(props){
@@ -322,7 +326,7 @@ class Viewer extends React.Component {
 						<Document
 							file={path.join(basePath, fileObject.relPath)}
 							onLoadSuccess={this.onDocumentLoadSuccess}
-							onLoadError={(error) => alert('Error while loading document! ' + error.message)}
+							onLoadError={(error) => this.props.showError(`Error while loading document ( ${error.message})`)}
 							options={{
 								// Missing fonts
 								disableFontFace: false

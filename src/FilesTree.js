@@ -33,11 +33,15 @@ class FilesTree extends React.Component {
 	static propTypes = {
 		classes: PropTypes.object.isRequired,
 		basePath: PropTypes.string,
-		setSelectedNode: PropTypes.func.isRequired
+		setSelectedNode: PropTypes.func.isRequired,
+		showSuccess: PropTypes.func,
+		showError: PropTypes.func
 	};
 
 	static defaultPropTypes = {
-		basePath: null
+		basePath: null,
+		showSuccess: () => {},
+		showError: () => {},
 	}
 
 	constructor(props){
@@ -67,13 +71,19 @@ class FilesTree extends React.Component {
 			res(fileList);
 		})
 		.then((fileList) => {
-			console.log("Read file list", fileList);
-			this.setState({
-				fileList
-			});			
+			if (fileList != null){
+				this.props.showSuccess(`Read ${fileList.length} files/dirs from: ${this.props.basePath}`)
+				this.setState({
+					fileList
+				});			
+			}
+			else {
+				this.props.showError(`Unable to read files/dirs from: ${this.props.basePath}`);
+				this.setState({
+					fileList: []
+				});					
+			}
 		})
-
-		console.log("End call updateFileTree...")
 
 	}	
 

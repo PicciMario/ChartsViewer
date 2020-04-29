@@ -5,6 +5,7 @@ import fs from 'fs'
  * Restituisce un array rappresentante il contenuto della cartella passata
  * come parametro (chiamata ricorsivamente).
  * @param {*} dirNode 
+ * @returns Array, null in case of error.
  */
 export function readDirTree(basePath, dirNode = null){
 	
@@ -20,7 +21,7 @@ export function readDirTree(basePath, dirNode = null){
 	}
 	catch (err){
 		console.log("Errore lettura dir", parentFullPath, err);
-		return [];
+		return null;
 	}
 
 	readFiles.forEach(dirElement => {
