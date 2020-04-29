@@ -6,6 +6,7 @@ import TreeItem from '@material-ui/lab/TreeItem';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import * as FileUtilities from './FileUtilities';
+import { Button } from '@material-ui/core';
 
 // Component styles -----------------------------------------------------------
 
@@ -167,6 +168,23 @@ class FilesTree extends React.Component {
 
 		return (
 
+			<React.Fragment>
+			<Button
+				onClick={() => {
+					this.props.setSelectedNode({
+						extension: ".pdf",
+						name: "LIRA.pdf",
+						parentRelPath: "Volo",
+						relPath: "Volo/LIRA.pdf",
+						type: "file",
+						page: 45,
+						scale: 2.3,
+						scrollX: 150,
+						scrollY: 300
+					})
+				}}
+			>LIRA RW15 ILS-U</Button>
+
 			<TreeView
 				className={classes.root}
 				defaultCollapseIcon={<ExpandMoreIcon />}
@@ -177,7 +195,7 @@ class FilesTree extends React.Component {
 				{this.renderDirContent(this.state.fileList)}
 
 			</TreeView>
-
+			</React.Fragment>
 		);
 	}
 }

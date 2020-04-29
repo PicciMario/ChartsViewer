@@ -113,8 +113,8 @@ class Viewer extends React.Component {
 		if (this.props.fileObject !== this.state.fileObject){
 			this.setState({
 				fileObject: this.props.fileObject,
-				pageNumber: 1,
-				scale: 1.0
+				pageNumber: this.props.fileObject.page || 1,
+				scale: this.props.fileObject.scale || 1.0,
 			})
 		}
 	}
@@ -125,8 +125,25 @@ class Viewer extends React.Component {
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ 
 			numPages,
-			pageNumber: 1
+			pageNumber: this.state.fileObject.page || 1,
+			scale: this.state.fileObject.scale || 1.0,
 		});
+
+		let {scrollX, scrollY} = this.state.fileObject;
+		if (scrollX != null || scrollY != null){
+			setTimeout(
+				() => {
+					let div = this.viewerDiv.current;
+					if (div == null) return;	
+					div.scrollTo(
+						scrollX || 0,
+						scrollY || 0
+					)				
+				},
+				1000
+			)
+		}
+
 	}
 	
 	/**
@@ -217,6 +234,13 @@ class Viewer extends React.Component {
 		const { pageNumber, numPages, fileObject, scale } = this.state;
 		const { basePath } = this.props;
 
+		let div = this.viewerDiv.current;
+		let scrollX = 0, scrollY = 0;
+		if (div != null){
+			scrollX = div.scrollLeft;
+			scrollY = div.scrollTop;
+		}
+
         return (
             
             <React.Fragment>
@@ -246,7 +270,7 @@ class Viewer extends React.Component {
 				</div>
 
                 <div className={classes.headerDiv}>
-					Path: {fileObject.name}
+					Scale: {this.state.scale}, Scroll: {scrollX}:{scrollY}
 					<Button onClick={() => this.setState({pageNumber: Math.max(pageNumber - 1, 0)})}>Prev</Button>				
 					<Button onClick={() => this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})}>Next</Button>				
 				</div>				
