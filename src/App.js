@@ -77,6 +77,13 @@ class App extends React.Component {
 
 		}
 
+		/*
+		// Remove default window menubar.
+		const remote = require('electron').remote;
+		const Menu = remote.Menu;
+		Menu.setApplicationMenu(null);	
+		*/
+
 	}
 
 	componentDidMount(){

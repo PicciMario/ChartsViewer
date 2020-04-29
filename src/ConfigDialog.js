@@ -80,7 +80,7 @@ export default class ConfigDialog extends React.Component{
     render(){
 
         return (
-            <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth="true">
+            <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth={true}>
                 <DialogTitle id="form-dialog-title">Application configuration.</DialogTitle>
                 <DialogContent>
                     <DialogContentText>

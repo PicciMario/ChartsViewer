@@ -68,6 +68,7 @@ class Viewer extends React.Component {
 		}
 
 		this.viewerDiv = React.createRef();
+		this.sliderDiv = React.createRef();
 		
 	}
 
@@ -80,6 +81,9 @@ class Viewer extends React.Component {
 		if (this.viewerDiv.current) {
 			this.viewerDiv.current.addEventListener('mousewheel', this.handleWheel, { passive: false});
 		}
+		if (this.sliderDiv.current){
+			this.sliderDiv.current.addEventListener('mousewheel', this.handleSliderWheel, {passive: false});
+		}
 
 	}
 
@@ -87,6 +91,9 @@ class Viewer extends React.Component {
 		if (this.viewerDiv.current) {
 			this.viewerDiv.current.removeEventListener('mousewheel', this.handleWheel);
 		}
+		if (this.sliderDiv.current) {
+			this.sliderDiv.current.removeEventListener('mousewheel', this.handleSliderWheel);
+		}		
 	}	
 
 	
@@ -125,6 +132,25 @@ class Viewer extends React.Component {
 		newScale = Math.min(newScale, 10);
 
 		this.setState({scale: newScale})
+
+	}	
+
+	/**
+	 * Callback gestione rotella mouse su slider pagine.
+	 */
+	handleSliderWheel = (e) => {
+		
+		e.preventDefault();
+
+		let wheelDir = e.deltaY;
+		let {pageNumber, numPages} = this.state;
+
+		if (wheelDir > 0){
+			this.setState({pageNumber: Math.min(pageNumber + 1, numPages)})
+		}
+		else {
+			this.setState({pageNumber: Math.max(pageNumber - 1, 0)})
+		}
 
 	}	
 
@@ -179,13 +205,11 @@ class Viewer extends React.Component {
 		const { pageNumber, numPages, fileObject, scale } = this.state;
 		const { basePath } = this.props;
 
-		console.log({pageNumber, numPages})
-
         return (
             
             <React.Fragment>
 
-                <div className={classes.pageSliderDiv}>
+                <div className={classes.pageSliderDiv} ref={this.sliderDiv}>
 					<Slider
 						value={this.state.numPages - this.state.pageNumber + 1}
 						orientation="vertical"
