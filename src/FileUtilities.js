@@ -27,6 +27,7 @@ export function readDirTree(basePath, dirNode = null){
 
 		let elementRelPath = path.join(parentRelPath || "", dirElement)
 		let elementFullPath = path.join(basePath, elementRelPath)
+		let elementExtension = path.extname(elementFullPath)
 
 		let stats;
 		try{
@@ -43,17 +44,22 @@ export function readDirTree(basePath, dirNode = null){
 				name: dirElement, 
 				relPath: elementRelPath, 
 				type: "dir"
-			};
+			};			
 			content.push(newNode)
 			readDirTree(basePath, newNode).forEach(item => content.push(item))
 
 		}
 		else {
+
+			// Filtra solo PDF
+			if (elementExtension.toUpperCase() !== '.PDF') return;
+
 			let newNode = {
 				parentRelPath: parentRelPath,
 				name: dirElement, 
 				relPath: elementRelPath, 
-				type: "file"
+				type: "file",
+				extension: elementExtension
 			};
 			content.push(newNode);
 		}
