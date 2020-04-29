@@ -72,11 +72,8 @@ class Viewer extends React.Component {
         super(props);
 
         this.state = {
-            numPages: null,
-			pageNumber: 1,
-			scale: 1.0,
-			fileObject: props.fileObject,
-			dragging: false
+			dragging: false,
+			numPages: 0
 		}
 
 		this.viewerDiv = React.createRef();
@@ -97,6 +94,13 @@ class Viewer extends React.Component {
 			this.sliderDiv.current.addEventListener('mousewheel', this.handleSliderWheel, {passive: false});
 		}
 
+		// This runs when the first document is selected after opening the app.
+		this.setState({
+			fileObject: this.props.fileObject,
+			pageNumber: this.props.fileObject.page || 1,
+			scale: this.props.fileObject.scale || 1.0,	
+		})
+
 	}
 
 	componentWillUnmount() {
@@ -110,6 +114,9 @@ class Viewer extends React.Component {
 
 	
 	componentDidUpdate(prevProps, prevState, snapshot){
+
+		// This runs when you select a new file on the tree, anytime BUT the
+		// first one (that is taken care of in componentDidMount).
 		if (this.props.fileObject !== this.state.fileObject){
 			this.setState({
 				fileObject: this.props.fileObject,
@@ -117,38 +124,39 @@ class Viewer extends React.Component {
 				scale: this.props.fileObject.scale || 1.0,
 			})
 		}
+
 	}
 
 	/**
-	 * Callback caricamento PDF.
+	 * Callback when a PDF has been loaded.
 	 */
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ 
-			numPages,
-			pageNumber: this.state.fileObject.page || 1,
-			scale: this.state.fileObject.scale || 1.0,
+			numPages
 		});
+	}
+
+	/**
+	 * Callback when a page has been rendered on screen.
+	 */
+	handlePageRenderSuccess = (() => {
 
 		let {scrollX, scrollY} = this.state.fileObject;
 		if (scrollX != null || scrollY != null){
-			setTimeout(
-				() => {
-					let div = this.viewerDiv.current;
-					if (div == null) return;	
-					div.scrollTo(
-						scrollX || 0,
-						scrollY || 0
-					)				
-				},
-				1000
-			)
+
+			let div = this.viewerDiv.current;
+			if (div == null) return;	
+			div.scrollTo(
+				scrollX || 0,
+				scrollY || 0
+			)	
 		}
 
-	}
+	})
 	
 	/**
-	 * Callback gestione rotella mouse su viewer.
-	 * Modifica la scalatura del documento.
+	 * Callback mousewheel when inside viewer div.
+	 * Takes care of the documents's scale.
 	 */
 	handleWheel = (e) => {
 		
@@ -165,7 +173,8 @@ class Viewer extends React.Component {
 	}	
 
 	/**
-	 * Callback gestione rotella mouse su slider pagine.
+	 * Callback mousewheel on page slider.
+	 * Navigates through the pages.
 	 */
 	handleSliderWheel = (e) => {
 		
@@ -184,8 +193,8 @@ class Viewer extends React.Component {
 	}	
 
 	/**
-	 * Callback gestione movimento mouse sul viewer.
-	 * Gestisce drag.
+	 * Callback when mouse moved inside viewer div.
+	 * Takes care of document dragging (when dragging enabled).
 	 */
 	handleMouseMove = (e) => {
 
@@ -247,6 +256,7 @@ class Viewer extends React.Component {
 
                 <div className={classes.pageSliderDiv} ref={this.sliderDiv}>
 
+					{/* Actual page number. */}
 					<span style={{alignSelf: 'center', marginBottom: 10}}>{this.state.pageNumber}</span>
 
 					<Slider
@@ -265,6 +275,7 @@ class Viewer extends React.Component {
 						}}
 					/>			
 
+					{/* Total number of pages. */}
 					<span style={{alignSelf: 'center', marginTop: 10}}>{this.state.numPages}</span>
 
 				</div>
@@ -298,6 +309,7 @@ class Viewer extends React.Component {
 							key={`page_${pageNumber + 1}`}
 							pageNumber={pageNumber}
 							scale={scale}
+							onRenderSuccess={this.handlePageRenderSuccess}
 						/>
 
 					</Document>
