@@ -49,7 +49,8 @@ class FilesTree extends React.Component {
 		super(props);
 		
 		this.state = {
-			fileList: []
+			fileList: [],
+			bookmarkData: {}
 		}
 
 	}
@@ -83,6 +84,23 @@ class FilesTree extends React.Component {
 					fileList: []
 				});					
 			}
+		})
+
+		new	Promise((res, rej) => {
+			try{
+				let bookmarkData = FileUtilities.readBookmarksFile(this.props.basePath);
+				res(bookmarkData)
+			}
+			catch (err){
+				rej("Errore lettura bookmarks: " + err)
+			}			
+		})
+		.then((bookmarkData) => {
+			this.setState({bookmarkData})
+		})
+		.catch((e) => {
+			this.setState({bookmarkData: {}})
+			console.err("Errore lettura bookmark data", e);
 		})
 
 	}	
@@ -194,6 +212,24 @@ class FilesTree extends React.Component {
 					})
 				}}
 			>LIRA RW15 ILS-U</Button>
+
+			{
+				this.state.bookmarkData.bookmarks 
+				&&
+				this.state.bookmarkData.bookmarks.map((bookmark, index) => 
+					<Button
+						key={'BKM'+index}
+						onClick={() => {
+							this.props.setSelectedNode({
+								extension: ".pdf",
+								name: bookmark.name,
+								relPath: bookmark.relPath,
+								type: "file"
+							})
+						}}
+					>{bookmark.name}</Button>					
+				)
+			}
 
 			<TreeView
 				className={classes.root}

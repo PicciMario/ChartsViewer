@@ -2,6 +2,41 @@ import path from 'path'
 import fs from 'fs'
 
 /**
+ * Read bookmark data from bookmarks.json in base path.
+ * @param {*} basePath 
+ * @returns Content of bookmarks.json, parsed as js object.
+ */
+export function readBookmarksFile(basePath){
+
+	if (basePath == null) throw new Error("Base path not selected.");
+
+	let fullPath = path.join(basePath, "bookmarks.json");
+
+	let rawdata = null;
+	let data = {}
+
+	try{
+		rawdata = fs.readFileSync(fullPath);
+	}
+	catch (err){
+		console.err("Error while parsing bookmarks file", err)
+		throw new Error("Error while parsing bookmarks file.");
+	}
+
+	try{
+		data = JSON.parse(rawdata);
+		console.log("data", data)
+	}
+	catch (err){
+		console.err("Error while reading bookmarks file", err)
+		throw new Error("Error while reading bookmarks file.");
+	}	
+
+	return data;
+
+}
+
+/**
  * Restituisce un array rappresentante il contenuto della cartella passata
  * come parametro (chiamata ricorsivamente).
  * @param {*} dirNode 

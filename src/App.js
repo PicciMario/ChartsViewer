@@ -86,6 +86,9 @@ class App extends React.Component {
 			// True to show config dialog
 			dialogOpen: false,
 
+			// True to show application main menu
+			menuOpen: false,
+
 			// States to manage snackbar
 			snackbarOpen: false,
 			snackbarText: '',

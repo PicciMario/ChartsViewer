@@ -277,7 +277,7 @@ class Viewer extends React.Component {
 						orientation="vertical"
 						aria-labelledby="discrete-slider-small-steps"
 						step={1}
-						marks={this.state.numPages && this.state.numPages < 500}
+						marks={this.state.numPages != null ? this.state.numPages < 500 : false}
 						min={1}
 						max={this.state.numPages}
 						scale={(val) =>  this.state.numPages - val + 1}
