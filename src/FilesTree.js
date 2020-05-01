@@ -7,25 +7,83 @@ import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import * as FileUtilities from './FileUtilities';
 import { Button } from '@material-ui/core';
+import MuiExpansionPanel from '@material-ui/core/ExpansionPanel';
+import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
 
 // Component styles -----------------------------------------------------------
 
 const styles = (theme) => ({
 
 	root: {
-		height: 240,
-		width: 240,
+		display: 'flex',
+		flexDirection: 'column',
+		height: '100%'
+	},
+
+	filesTree: {
+		//height: 240,
+		//width: 240,
+		//flexGrow: 1,
+		//maxWidth: 400,
+	},
+
+	treeviewDiv: {
 		flexGrow: 1,
-		maxWidth: 400,
+		overflowY: 'auto'
 	},
 
 	treeItemLabel: {
 		overflow: "hidden",
 		textOverflow: "ellipsis",
 		whiteSpace: "nowrap"
-	}
+	},
 
 });
+
+const ExpansionPanel = withStyles({
+	root: {
+	  border: '1px solid rgba(0, 0, 0, .125)',
+	  boxShadow: 'none',
+	  '&:not(:last-child)': {
+		borderBottom: 0,
+	  },
+	  '&:before': {
+		display: 'none',
+	  },
+	  '&$expanded': {
+		//margin: 'auto',
+		marginTop: 0
+	  },
+	},
+	expanded: {},
+  })(MuiExpansionPanel);
+
+const ExpansionPanelSummary = withStyles({
+	root: {
+	  backgroundColor: 'rgba(0, 0, 0, .03)',
+	  borderBottom: '1px solid rgba(0, 0, 0, .125)',
+	  marginBottom: -1,
+	  minHeight: 40,
+	  '&$expanded': {
+		minHeight: 40,
+	  },
+	},
+	content: {
+	  '&$expanded': {
+		margin: '12px 0',
+	  },
+	},
+	expanded: {},
+  })(MuiExpansionPanelSummary);
+
+  const ExpansionPanelDetails = withStyles((theme) => ({
+	root: {
+	  padding: 2//theme.spacing(2),
+	},
+  }))(MuiExpansionPanelDetails);
 
 // ----------------------------------------------------------------------------  
 class FilesTree extends React.Component {
@@ -196,7 +254,8 @@ class FilesTree extends React.Component {
 
 		return (
 
-			<React.Fragment>
+			<div className={classes.root}>
+
 			<Button
 				onClick={() => {
 					this.props.setSelectedNode({
@@ -213,35 +272,62 @@ class FilesTree extends React.Component {
 				}}
 			>LIRA RW15 ILS-U</Button>
 
-			{
-				this.state.bookmarkData.bookmarks 
-				&&
-				this.state.bookmarkData.bookmarks.map((bookmark, index) => 
-					<Button
-						key={'BKM'+index}
-						onClick={() => {
-							this.props.setSelectedNode({
-								extension: ".pdf",
-								name: bookmark.name,
-								relPath: bookmark.relPath,
-								type: "file"
-							})
+			<div className={classes.treeviewDiv}>
+				<TreeView
+					className={classes.filesTree}
+					defaultCollapseIcon={<ExpandMoreIcon />}
+					defaultExpandIcon={<ChevronRightIcon />}
+					onNodeSelect={this.onNodeSelect}
+				>
+
+					{this.renderDirContent(this.state.fileList)}
+
+				</TreeView>
+			</div>
+
+			<Divider />
+
+			<ExpansionPanel>
+				<ExpansionPanelSummary
+					expandIcon={<ExpandMoreIcon />}
+					aria-controls="panel1a-content"
+					id="panel1a-header"
+					color="primary"
+				>
+					<Typography>Bookmarks</Typography>
+				</ExpansionPanelSummary>
+				<ExpansionPanelDetails>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: "column",
+							maxHeight: '40vh',
+							overflowY:'auto',
+							width: '100%'
 						}}
-					>{bookmark.name}</Button>					
-				)
-			}
+					>
+					{
+						this.state.bookmarkData.bookmarks 
+						&&
+						this.state.bookmarkData.bookmarks.map((bookmark, index) => 
+							<Button
+								key={'BKM'+index}
+								onClick={() => {
+									this.props.setSelectedNode({
+										extension: ".pdf",
+										name: bookmark.name,
+										relPath: bookmark.relPath,
+										type: "file"
+									})
+								}}
+							>{bookmark.name}</Button>					
+						)
+					}
+					</div>
+				</ExpansionPanelDetails>
+			</ExpansionPanel>
 
-			<TreeView
-				className={classes.root}
-				defaultCollapseIcon={<ExpandMoreIcon />}
-				defaultExpandIcon={<ChevronRightIcon />}
-				onNodeSelect={this.onNodeSelect}
-			>
-
-				{this.renderDirContent(this.state.fileList)}
-
-			</TreeView>
-			</React.Fragment>
+			</div>
 		);
 	}
 }
