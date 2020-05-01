@@ -19,7 +19,7 @@ export function readBookmarksFile(basePath){
 		rawdata = fs.readFileSync(fullPath);
 	}
 	catch (err){
-		console.err("Error while parsing bookmarks file", err)
+		console.error("Error while parsing bookmarks file", err)
 		throw new Error("Error while parsing bookmarks file.");
 	}
 
@@ -28,7 +28,7 @@ export function readBookmarksFile(basePath){
 		console.log("data", data)
 	}
 	catch (err){
-		console.err("Error while reading bookmarks file", err)
+		console.error("Error while reading bookmarks file", err)
 		throw new Error("Error while reading bookmarks file.");
 	}	
 

@@ -10,6 +10,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import IconButton from '@material-ui/core/IconButton';
+
+const { app, BrowserWindow, dialog } = require('electron').remote;
 
 export default class ConfigDialog extends React.Component{
 
@@ -62,10 +67,16 @@ export default class ConfigDialog extends React.Component{
 
     }
 
+	/**
+	 * Callback when editing base path.
+	 */
     handleBasePathChange = (e) => {
         this.setState({basePath: e.target.value})
 	}
 	
+	/**
+	 * Handle form submit.
+	 */
 	handleSubmit = (e) => {
 		let keys = {
 			basePath: this.state.basePath
@@ -73,8 +84,43 @@ export default class ConfigDialog extends React.Component{
 		this.props.onSubmit(keys);
 	}
 
+	/**
+	 * Handle form close.
+	 */
 	handleClose = (e) => {
 		this.props.onClose();
+	}
+
+	/**
+	 * Selection button on basepath input field.
+	 */
+	basepathFolderButton = () => 
+		<InputAdornment position="start">
+			<IconButton onClick={this.handleBasepathFolderButton}>
+				<FolderOpenIcon/>
+			</IconButton>
+		</InputAdornment>	
+
+	/**
+	 * Handle selection button on basepath folder input field.
+	 */
+	handleBasepathFolderButton = () => {
+
+		dialog.showOpenDialog({
+			title: "Select documents folder",
+			buttonLabel: "Select",
+			properties: ['openDirectory']
+		})
+		.then(result => {
+
+			console.log(result)
+		
+			if (!result.filePaths || result.filePaths.length === 0) { return; }
+			
+			this.setState({basePath: result.filePaths[0]});
+
+		})	
+
 	}
 
     render(){
@@ -94,7 +140,10 @@ export default class ConfigDialog extends React.Component{
                         helperText="Directory which contains the documents."
                         value={this.state.basePath}
                         onChange={this.handleBasePathChange}
-                        fullWidth
+						fullWidth
+						InputProps={{
+							startAdornment: this.basepathFolderButton(),
+						}}						
                     />
                 </DialogContent>
                 <DialogActions>

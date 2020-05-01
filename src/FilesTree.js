@@ -92,7 +92,7 @@ class FilesTree extends React.Component {
 				res(bookmarkData)
 			}
 			catch (err){
-				rej("Errore lettura bookmarks: " + err)
+				rej("Error while reading bookmarks: " + err)
 			}			
 		})
 		.then((bookmarkData) => {
@@ -100,7 +100,7 @@ class FilesTree extends React.Component {
 		})
 		.catch((e) => {
 			this.setState({bookmarkData: {}})
-			console.err("Errore lettura bookmark data", e);
+			console.error("Error while reading bookmarks", e);
 		})
 
 	}	
