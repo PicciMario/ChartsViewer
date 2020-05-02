@@ -211,41 +211,25 @@ class FilesTree extends React.Component {
 
 			<div className={classes.root}>
 
-			<Button
-				onClick={() => {
-					this.props.setSelectedNode({
-						extension: ".pdf",
-						name: "LIRA.pdf",
-						parentRelPath: "Volo",
-						relPath: "Volo/LIRA.pdf",
-						type: "file",
-						page: 45,
-						scale: 2.3,
-						scrollX: 150,
-						scrollY: 300
-					})
-				}}
-			>LIRA RW15 ILS-U</Button>
+				<div className={classes.treeviewDiv}>
+					<TreeView
+						className={classes.filesTree}
+						defaultCollapseIcon={<ExpandMoreIcon />}
+						defaultExpandIcon={<ChevronRightIcon />}
+						onNodeSelect={this.onNodeSelect}
+					>
 
-			<div className={classes.treeviewDiv}>
-				<TreeView
-					className={classes.filesTree}
-					defaultCollapseIcon={<ExpandMoreIcon />}
-					defaultExpandIcon={<ChevronRightIcon />}
-					onNodeSelect={this.onNodeSelect}
-				>
+						{this.renderDirContent(this.state.fileList)}
 
-					{this.renderDirContent(this.state.fileList)}
+					</TreeView>
+				</div>
 
-				</TreeView>
-			</div>
+				<Divider />
 
-			<Divider />
-
-			<BookmarksPanel 
-				bookmarkData={this.state.bookmarkData}
-				setSelectedNode={this.props.setSelectedNode}
-			/>
+				<BookmarksPanel 
+					bookmarkData={this.state.bookmarkData}
+					setSelectedNode={this.props.setSelectedNode}
+				/>
 
 			</div>
 		);

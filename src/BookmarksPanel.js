@@ -4,7 +4,7 @@ import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { Button } from '@material-ui/core';
 
 // Expansion panel styling ----------------------------------------------------
@@ -60,7 +60,7 @@ export default function BookmarksPanel(props){
 		<ExpansionPanel>
 
 			<ExpansionPanelSummary
-				expandIcon={<ExpandMoreIcon />}
+				expandIcon={<ExpandLessIcon />}
 				aria-controls="panel1a-content"
 				id="panel1a-header"
 				color="primary"
