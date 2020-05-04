@@ -5,8 +5,6 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import * as FileUtilities from './FileUtilities';
-import { Button } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import BookmarksPanel from './BookmarksPanel';
 
@@ -48,75 +46,18 @@ class FilesTree extends React.Component {
 		basePath: PropTypes.string,
 		setSelectedNode: PropTypes.func.isRequired,
 		showSuccess: PropTypes.func,
-		showError: PropTypes.func
+		showError: PropTypes.func,
+		fileList: PropTypes.array,
+		bookmarkData: PropTypes.object
 	};
 
 	static defaultPropTypes = {
 		basePath: null,
 		showSuccess: () => {},
 		showError: () => {},
+		fileList: [],
+		bookmarkData: {}
 	}
-
-	constructor(props){
-		
-		super(props);
-		
-		this.state = {
-			fileList: [],
-			bookmarkData: {}
-		}
-
-	}
-
-	componentDidUpdate(prevProps, prevState){
-		if (this.props.basePath !== prevProps.basePath){
-			this.updateFileTree();
-		}
-	}
-
-	updateFileTree(){
-
-		if (this.props.basePath == null) return;
-
-		console.log("Calling updateFileTree...")
-
-		new Promise((res, rej) => {
-			let fileList = FileUtilities.readDirTree(this.props.basePath);
-			res(fileList);
-		})
-		.then((fileList) => {
-			if (fileList != null){
-				this.props.showSuccess(`Read ${fileList.length} files/dirs from: ${this.props.basePath}`)
-				this.setState({
-					fileList
-				});			
-			}
-			else {
-				this.props.showError(`Unable to read files/dirs from: ${this.props.basePath}`);
-				this.setState({
-					fileList: []
-				});					
-			}
-		})
-
-		new	Promise((res, rej) => {
-			try{
-				let bookmarkData = FileUtilities.readBookmarksFile(this.props.basePath);
-				res(bookmarkData)
-			}
-			catch (err){
-				rej("Error while reading bookmarks: " + err)
-			}			
-		})
-		.then((bookmarkData) => {
-			this.setState({bookmarkData})
-		})
-		.catch((e) => {
-			this.setState({bookmarkData: {}})
-			console.error("Error while reading bookmarks", e);
-		})
-
-	}	
 
 	/**
 	 * Tree items renderer. Renders the tree items from the list who have
@@ -196,7 +137,7 @@ class FilesTree extends React.Component {
 	 * Node selection callback.
 	 */
 	onNodeSelect = (event, value) => {
-		let fileObject = this.state.fileList.find(item => item.relPath === value);
+		let fileObject = this.props.fileList.find(item => item.relPath === value);
 		if (fileObject !== null && fileObject.type === 'file'){
 			this.props.setSelectedNode(fileObject);
 		}
@@ -204,8 +145,7 @@ class FilesTree extends React.Component {
 
 	render(){
 
-		// Custom styles classnames
-		const {classes} = this.props;
+		const {classes, bookmarkData, fileList} = this.props;
 
 		return (
 
@@ -219,7 +159,7 @@ class FilesTree extends React.Component {
 						onNodeSelect={this.onNodeSelect}
 					>
 
-						{this.renderDirContent(this.state.fileList)}
+						{this.renderDirContent(fileList)}
 
 					</TreeView>
 				</div>
@@ -227,7 +167,7 @@ class FilesTree extends React.Component {
 				<Divider />
 
 				<BookmarksPanel 
-					bookmarkData={this.state.bookmarkData}
+					bookmarkData={bookmarkData}
 					setSelectedNode={this.props.setSelectedNode}
 				/>
 

@@ -14,6 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import * as FileUtilities from './FileUtilities';
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -92,7 +93,10 @@ class App extends React.Component {
 			// States to manage snackbar
 			snackbarOpen: false,
 			snackbarText: '',
-			snackbarSeverity: "success"
+			snackbarSeverity: "success",
+
+			fileList: [],
+			bookmarkData: {}
 
 		}
 
@@ -113,10 +117,54 @@ class App extends React.Component {
 			{
 				basePath: globalConfig.get("basePath", null)
 			},
-			this.updateFileTree
+			() => this.updateFileTree(this.state.basePath)
 		)
 
 	}
+
+	updateFileTree(basePath){
+
+		if (basePath == null) return;
+
+		console.log("Calling updateFileTree...")
+
+		new Promise((res, rej) => {
+			let fileList = FileUtilities.readDirTree(basePath);
+			res(fileList);
+		})
+		.then((fileList) => {
+			if (fileList != null){
+				this.showSuccess(`Read ${fileList.length} files/dirs from: ${basePath}`)
+				this.setState({
+					fileList
+				});			
+			}
+			else {
+				this.showError(`Unable to read files/dirs from: ${basePath}`);
+				this.setState({
+					fileList: []
+				});					
+			}
+		})
+
+		new	Promise((res, rej) => {
+			try{
+				let bookmarkData = FileUtilities.readBookmarksFile(basePath);
+				res(bookmarkData)
+			}
+			catch (err){
+				rej("Error while reading bookmarks: " + err)
+			}			
+		})
+		.then((bookmarkData) => {
+			this.setState({bookmarkData})
+		})
+		.catch((e) => {
+			this.setState({bookmarkData: {}})
+			console.error("Error while reading bookmarks", e);
+		})
+
+	}		
 
 	setSelectedNode = (selNode) => {
 		this.setState({
@@ -151,6 +199,8 @@ class App extends React.Component {
 	 */
 	handleConfigDialogSubmit = (keys) => {
 
+		console.log("dialog submit", keys, this.state)
+
 		let newState = {dialogOpen: false};
 
 		if (keys != null){
@@ -173,7 +223,11 @@ class App extends React.Component {
 
 		}
 
-		this.setState(newState);
+		console.log("setting newstate", newState)
+		this.setState(
+			newState,
+			() => this.updateFileTree(this.state.basePath)
+		);
 
 	}	
 
@@ -292,6 +346,8 @@ class App extends React.Component {
 						setSelectedNode={this.setSelectedNode}
 						showSuccess={this.showSuccess}
 						showError={this.showError}
+						bookmarkData={this.state.bookmarkData}
+						fileList={this.state.fileList}
 					/>
 				</div>
 

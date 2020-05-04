@@ -14,7 +14,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import IconButton from '@material-ui/core/IconButton';
 
-const { app, BrowserWindow, dialog } = require('electron').remote;
+const { dialog } = require('electron').remote;
 
 export default class ConfigDialog extends React.Component{
 
